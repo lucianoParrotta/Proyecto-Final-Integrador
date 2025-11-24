@@ -1,11 +1,13 @@
-# División de Tareas del Proyecto Final Integrador  
-*(Versión para organización del equipo, sin estructura Jira)*
+# 📌 División de Tareas del Proyecto Final Integrador  
+*(Versión actualizada con corrección de responsabilidades – equilibrada y lista para uso del equipo)*
 
-## 👥 Integrantes
-- Luciano Parrotta  
-- Federico Ruppel  
-- Franco Muñoz  
-- Camilo Dietrich  
+---
+
+# 👥 Integrantes
+- **Luciano Parrotta**
+- **Federico Ruppel**
+- **Franco Muñoz**
+- **Camilo Dietrich**
 
 ---
 
@@ -19,10 +21,10 @@
 | **Camilo Dietrich** | Movimientos de Stock |
 
 Cada alumno debe entregar su módulo con:
-- Listado con búsqueda, filtros y paginado  
-- Visualización individual  
-- CRUD completo  
-- Consultas por pantalla (si aplica)  
+- Listado con búsqueda, filtros y paginado
+- Visualización individual
+- CRUD completo
+- Consultas especiales
 - Reportes PDF/XLS (completo + filtrado)
 
 ---
@@ -31,102 +33,103 @@ Cada alumno debe entregar su módulo con:
 
 ## 🟦 Luciano Parrotta — Módulo Productos
 ### Backend
-- Modelo Producto en Sequelize  
-- Relación con Categoría y Proveedor  
-- Controlador y rutas CRUD  
+- Modelo Producto en Sequelize
+- Relación con Categoría y Proveedor
+- Controlador y rutas CRUD
 - Consultas especiales (productos con stock bajo, por categoría, por proveedor)
 
 ### Frontend
-- Pantalla de productos  
-- Tabla con búsqueda + filtros + paginado  
-- Vista individual  
-- Formulario ABM  
-- Reportes PDF/XLS  
-  - Listado completo  
-  - Filtrado  
-  - **Valorización del stock (entregable de Luciano)**  
+- Pantalla de productos
+- Tabla con búsqueda + filtros + paginado
+- Vista individual
+- Formulario ABM
+- Reportes PDF/XLS:
+  - Listado completo
+  - Filtrado
+  - **Valorización del stock (entregable propio)**
 
 ---
 
 ## 🟩 Federico Ruppel — Módulo Categorías
 ### Backend
-- Modelo Categoría  
-- CRUD completo  
+- Modelo Categoría
+- CRUD completo
 - Consultas especiales (cantidad de productos por categoría)
 
 ### Frontend
-- Pantalla de categorías  
-- Tabla con búsqueda + paginado  
-- ABM completo  
-- Reportes PDF/XLS  
-  - Listado completo  
-  - Filtrado  
-  - **Stock bajo por categoría (entregable de Federico)**  
+- Pantalla de categorías
+- Tabla con búsqueda + paginado
+- ABM completo
+- Reportes PDF/XLS:
+  - Listado completo
+  - Filtrado
+  - **Stock bajo por categoría (entregable)**
 
 ---
 
 ## 🟨 Franco Muñoz — Módulo Proveedores
 ### Backend
-- Modelo Proveedor  
-- CRUD completo  
+- Modelo Proveedor
+- CRUD completo
 - Consultas especiales (productos por proveedor)
 
 ### Frontend
-- Pantalla de proveedores  
-- Tabla con búsqueda + paginado  
-- ABM completo  
-- Reportes PDF/XLS  
-  - Listado completo  
-  - Filtrado  
-  - **Valorización del stock por proveedor (entregable de Franco)**  
+- Pantalla de proveedores
+- Tabla con búsqueda + paginado
+- ABM completo
+- Reportes PDF/XLS:
+  - Listado completo
+  - Filtrado
+  - **Valorización del stock por proveedor (entregable)**
 
 ---
 
 ## 🟥 Camilo Dietrich — Movimientos de Stock
 ### Backend
-- Modelo MovimientoStock  
-- CRUD completo  
-- Impacto en stock del producto  
-- Eliminación recalcula stock
+- Modelo MovimientoStock
+- CRUD completo
+- Impacto en stock del producto
+- Recalcular stock al eliminar movimiento
 
 ### Frontend
-- Pantalla de movimientos  
-- Tabla con filtros avanzados (fecha, tipo, producto)  
-- ABM  
-- Reportes PDF/XLS  
-  - Movimientos por período  
-  - **Rotación por producto (entregable de Camilo)**  
+- Pantalla de movimientos
+- Tabla con filtros avanzados (fecha, tipo, producto)
+- ABM
+- Reportes PDF/XLS:
+  - Movimientos por período
+  - **Rotación por producto (entregable)**
 
 ---
 
 # 3. División Global del Sistema (Reparto Equilibrado)
 
 ## Luciano (Frontend)
-- Navbar + Sidebar  
-- Layout general  
-- Home del sistema  
-- Estadísticas principales  
-- Diseño general UI  
-- README técnico del FRONTEND  
+- Navbar + Sidebar
+- Layout general
+- Home del sistema
+- Estadísticas principales (solo consumo, no creación de endpoints)
+- Diseño general UI
+- README técnico del FRONTEND
 
 ## Federico (Backend + Docs)
-- README técnico principal global  
-- Diagrama ER  
-- Colección completa de Postman  
-- Middleware API_KEY global  
+- README técnico principal (global)
+- Diagrama ER
+- Colección Postman completa
+- Middleware API_KEY global
+- **Implementación de endpoints de estadísticas**
 
 ## Franco (Backend + Deploy)
-- Deploy del backend en Render  
-- Variables de entorno en producción  
-- Estandarización de controladores backend  
-- Ayuda en organización del backend  
+- Deploy del backend en Render
+- Variables de entorno
+- Estructura y estandarización de controladores backend
+- **Soporte en endpoints de estadísticas**
+- Organización general backend
 
 ## Camilo (Frontend + Deploy)
-- Deploy del frontend en Vercel  
-- Perfil del usuario  
-- Login + persistencia  
-- Integración de estadísticas con el home  
- 
+- Login y persistencia
+- Perfil de usuario
+- Deploy del frontend en Vercel
+- Integración de estadísticas con el home
 
 ---
 
@@ -142,16 +145,16 @@ Cada alumno debe entregar su módulo con:
 ## TASK 1.1 — Configuración inicial del Frontend (Vite + React + TS + Tailwind)
 - SUBTASK 1.1.1: Configurar Vite
 - SUBTASK 1.1.2: Configurar Tailwind
-- SUBTASK 1.1.3: Crear estructura base (pages, components, layouts)
+- SUBTASK 1.1.3: Estructura base (pages, components, layouts)
 - SUBTASK 1.1.4: Configurar React Router
-- SUBTASK 1.1.5: Configurar variables de entorno (.env)
+- SUBTASK 1.1.5: Configurar variables de entorno
 
 ---
 
 ## TASK 1.2 — Layout general del sistema (Responsable: Luciano)
 - SUBTASK 1.2.1: Navbar
 - SUBTASK 1.2.2: Sidebar
-- SUBTASK 1.2.3: AppLayout (estructura de página)
+- SUBTASK 1.2.3: AppLayout
 - SUBTASK 1.2.4: Footer
 - SUBTASK 1.2.5: Responsive general
 
@@ -159,8 +162,9 @@ Cada alumno debe entregar su módulo con:
 
 ## TASK 1.3 — Home + estadísticas principales (Responsable: Luciano)
 - SUBTASK 1.3.1: UI del dashboard
-- SUBTASK 1.3.2: Crear endpoints de estadísticas (backend)
-- SUBTASK 1.3.3: Integración de estadísticas en frontend
+- ~~SUBTASK 1.3.2: Crear endpoints de estadísticas (backend)~~ ❌ Eliminada
+- **NUEVA SUBTASK 1.3.2:** Documentar requerimientos de estadísticas
+- SUBTASK 1.3.3: Integrar estadísticas del backend
 - SUBTASK 1.3.4: Cards, gráficos y métricas
 - SUBTASK 1.3.5: Alertas de stock bajo
 
@@ -170,7 +174,7 @@ Cada alumno debe entregar su módulo con:
 - SUBTASK 1.4.1: Login
 - SUBTASK 1.4.2: Recuperación de contraseña (vista)
 - SUBTASK 1.4.3: Persistencia de sesión
-- SUBTASK 1.4.4: Página perfil del usuario
+- SUBTASK 1.4.4: Página de perfil
 - SUBTASK 1.4.5: Logout
 
 ---
@@ -207,73 +211,83 @@ Cada alumno debe entregar su módulo con:
 
 ---
 
-# 🧱 EPIC 3 — Módulos del Sistema (Entregables por Integrante)
+## 🆕 TASK 2.4 — Endpoints de Estadísticas (Responsables: Federico & Franco)
+- SUBTASK 2.4.1: Definir `/stats/dashboard`
+- SUBTASK 2.4.2: Consultas SQL necesarias:
+  - Total de productos
+  - Productos con stock bajo
+  - Valorización del stock
+  - Cantidad por categoría
+  - Cantidad por proveedor
+  - Rotación (si aplica)
+- SUBTASK 2.4.3: Implementación backend
+- SUBTASK 2.4.4: Aplicar API_KEY
+- SUBTASK 2.4.5: Documentación completa en Postman
 
 ---
 
+# 🧱 EPIC 3 — Módulos del Sistema (Entregables por Integrante)
+
 ## 🟦 EPIC 3.1 — Productos (Responsable: Luciano)
 ### Backend
-- SUBTASK: Definir modelo Producto
-- SUBTASK: Relaciones (categoría, proveedor)
-- SUBTASK: CRUD completo
-- SUBTASK: Consultas especiales
+- Modelo Producto
+- Relaciones
+- CRUD completo
+- Consultas especiales
 
 ### Frontend
-- SUBTASK: Pantalla `/productos`
-- SUBTASK: Tabla + filtros + búsqueda
-- SUBTASK: Vista individual
-- SUBTASK: ABM completo
-- SUBTASK: Exportación PDF/XLS
-- SUBTASK: Reporte valorización del stock
+- Pantalla `/productos`
+- Tabla + filtros + búsqueda
+- Vista individual
+- ABM completo
+- Exportación PDF/XLS
+- **Reporte valorización del stock**
 
 ---
 
 ## 🟩 EPIC 3.2 — Categorías (Responsable: Federico)
 ### Backend
-- SUBTASK: Modelo Categoría
-- SUBTASK: CRUD completo
+- Modelo Categoría
+- CRUD completo
 
 ### Frontend
-- SUBTASK: Pantalla `/categorias`
-- SUBTASK: Tabla + paginado
-- SUBTASK: ABM completo  
-- SUBTASK: Reporte stock bajo por categoría
+- Pantalla `/categorias`
+- Tabla + paginado
+- ABM
+- **Reporte stock bajo por categoría**
 
 ---
 
 ## 🟨 EPIC 3.3 — Proveedores (Responsable: Franco)
 ### Backend
-- SUBTASK: Modelo Proveedor
-- SUBTASK: CRUD completo
+- Modelo Proveedor
+- CRUD completo
 
 ### Frontend
-- SUBTASK: Pantalla `/proveedores`
-- SUBTASK: Tabla + paginado
-- SUBTASK: ABM completo
-- SUBTASK: Reporte valorización de stock por proveedor
+- Pantalla `/proveedores`
+- Tabla
+- ABM
+- **Reporte valorización de stock por proveedor**
 
 ---
 
 ## 🟥 EPIC 3.4 — Movimientos de Stock (Responsable: Camilo)
 ### Backend
-- SUBTASK: Modelo MovimientoStock
-- SUBTASK: CRUD completo
-- SUBTASK: Impacto en stock
-- SUBTASK: Recalcular stock al eliminar
+- Modelo MovimientoStock
+- CRUD completo
+- Actualización de stock
 
 ### Frontend
-- SUBTASK: Pantalla `/movimientos`
-- SUBTASK: Tabla con filtros avanzados
-- SUBTASK: ABM completo
-- SUBTASK: Reporte de rotación por período
+- Pantalla `/movimientos`
+- Tabla con filtros avanzados
+- ABM
+- **Reporte de rotación por período**
 
 ---
 
 # 🧱 EPIC 4 — Entregables Finales
 
-## TASK 4.1 — README técnico global (Responsable: Federico)
-## TASK 4.2 — Colección Postman completa (Responsable: Federico)
-## TASK 4.3 — Deploy del Frontend (Responsable: Camilo)
-## TASK 4.4 — Diagramas, ER y documentación (Responsable: Federico)
-
----
+## TASK 4.1 — README técnico global (Federico)
+## TASK 4.2 — Colección Postman completa (Federico)
+## TASK 4.3 — Deploy del frontend (Camilo)
+## TASK 4.4 — Diagramas, ER y documentación (Federico)
