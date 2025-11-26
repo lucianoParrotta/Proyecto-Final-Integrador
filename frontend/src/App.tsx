@@ -1,9 +1,20 @@
-import './App.css'
+import React from "react";
+import { Routes, Route } from "react-router-dom";
+import AppLayout from "./layouts/AppLayout";
+import HomePage from "./pages/HomePage";
+import ProductosListPage from "./pages/ProductosListPage";
 
-export default function App() {
+const App: React.FC = () => {
   return (
-    <div className="h-screen flex items-center justify-center bg-blue-600 text-white text-3xl font-bold">
-      Tailwind OK 🚀
-    </div>
+    <Routes>
+      {/* Rutas con el layout general */}
+      <Route path="/" element={<AppLayout />}>
+        <Route index element={<HomePage />} />
+        <Route path="productos" element={<ProductosListPage />} />
+        {/* después sumamos más rutas: categorías, etc. */}
+      </Route>
+    </Routes>
   );
-}
+};
+
+export default App;
