@@ -10,6 +10,6 @@ app.use(cors());
 app.use(express.json());
 
 // Rutas
-app.use("/", routes);
+app.use("/api", routes);
 
 module.exports = app;
