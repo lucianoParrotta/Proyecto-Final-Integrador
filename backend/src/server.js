@@ -10,6 +10,9 @@ async function start() {
     await sequelize.authenticate();
     console.log("✅ Conexión a la BD OK");
 
+    await sequelize.sync({ alter: true });
+    console.log("🔧 Tablas sincronizadas");
+
     app.listen(PORT, () => {
       console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
     });
