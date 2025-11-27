@@ -14,9 +14,10 @@ app.use(express.json());
 app.use(apiKeyMiddleware);
 
 // Rutas
-app.use("/", routes);
 app.use("/api/auth", authRoutes);
+app.use("/api", routes);          
 
+// Manejo de errores
 app.use(errorHandler);
 
 module.exports = app;
