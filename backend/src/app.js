@@ -5,6 +5,7 @@ const routes = require("./routes");
 const apiKeyMiddleware = require("./middlewares/apiKey");
 const errorHandler = require('./middlewares/errorHandler');
 const authRoutes = require("./routes/auth");
+const statsRoutes = require("./routes/stats");
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(apiKeyMiddleware);
 // Rutas
 app.use("/api/auth", authRoutes);
 app.use("/api", routes);          
+app.use("/api/stats", statsRoutes);
 
 // Manejo de errores
 app.use(errorHandler);
