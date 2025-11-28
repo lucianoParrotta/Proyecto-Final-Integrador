@@ -7,4 +7,8 @@ router.get("/ping", (req, res) => {
   res.json({ ok: true, message: "pong" });
 });
 
+router.use("/auth", require("./auth"));
+
+router.use("/categorias", require("./categorias"));
+
 module.exports = router;

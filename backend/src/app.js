@@ -1,11 +1,12 @@
 // CJS (sin "type": "module")
 const express = require("express");
 const cors = require("cors");
-const routes = require("./routes");
+
 const apiKeyMiddleware = require("./middlewares/apiKey");
 const errorHandler = require('./middlewares/errorHandler');
 const authRoutes = require("./routes/auth");
 const statsRoutes = require("./routes/stats");
+const categoriasRoutes = require("./routes/categorias");
 
 const app = express();
 
@@ -16,8 +17,9 @@ app.use(apiKeyMiddleware);
 
 // Rutas
 app.use("/api/auth", authRoutes);
-app.use("/api", routes);          
+
 app.use("/api/stats", statsRoutes);
+app.use("/api/categorias", apiKeyMiddleware ,categoriasRoutes);
 
 // Manejo de errores
 app.use(errorHandler);
