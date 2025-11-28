@@ -1,0 +1,30 @@
+{
+  "info": {
+    "name": "Stats",
+    "_postman_id": "6a98d9d7-552c-4e6d-b09f-123456789aaa",
+    "description": "Endpoints de estadísticas del sistema",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "GET /api/stats/dashboard",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "x-api-key",
+            "value": "{{API_KEY_STATS}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/stats/dashboard",
+          "host": ["{{base_url}}"],
+          "path": ["api", "stats", "dashboard"]
+        },
+        "description": "Dashboard de estadísticas globales del inventario"
+      },
+      "response": []
+    }
+  ]
+}
