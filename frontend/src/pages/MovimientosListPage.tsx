@@ -244,6 +244,43 @@ const MovimientosListPage: React.FC = () => {
     }
   };
 
+  const exportarRotacion = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/movimientos/reportes/rotacion`, {
+        headers: {
+          'x-api-key': import.meta.env.VITE_API_KEY || 'test-key',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      const csvContent = [
+        ['Producto ID', 'Total Entradas', 'Total Salidas', 'Rotación (Salidas/Entradas)'],
+        ...data.map((rot: any) => [
+          rot.productoId,
+          rot.totalEntradas,
+          rot.totalSalidas,
+          (rot.totalEntradas > 0 ? (rot.totalSalidas / rot.totalEntradas).toFixed(2) : '0.00'),
+        ]),
+      ];
+
+      const csv = csvContent.map(row => row.join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `rotacion-productos-${new Date().toISOString().split('T')[0]}.csv`;
+      link.click();
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
+      setError(errorMessage);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
       <div className="max-w-7xl mx-auto">
@@ -269,12 +306,20 @@ const MovimientosListPage: React.FC = () => {
             >
               + Nuevo Movimiento
             </button>
-            <button
-              onClick={exportarPDF}
-              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition"
-            >
-              📥 Exportar CSV
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={exportarPDF}
+                className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition"
+              >
+                📥 Exportar Movimientos
+              </button>
+              <button
+                onClick={exportarRotacion}
+                className="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded-lg transition"
+              >
+                📊 Reporte Rotación
+              </button>
+            </div>
           </div>
 
           {/* Filtros */}
