@@ -1,34 +1,37 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-
-interface User {
-  user: string;
-  loginTime: string;
-}
+import { useAuth } from '../context/AuthContext';
 
 const ProfilePage: React.FC = () => {
-  const [usuario, setUsuario] = useState<User | null>(null);
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  const [showConfirmLogout, setShowConfirmLogout] = useState(false);
   const [editando, setEditando] = useState(false);
   const [nuevoPassword, setNuevoPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const navigate = useNavigate();
 
-  useEffect(() => {
-    // Cargar datos del usuario del localStorage
-    const userData = localStorage.getItem('user');
-    if (!userData) {
-      navigate('/login');
-      return;
-    }
-    setUsuario(JSON.parse(userData));
-  }, [navigate]);
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6 flex items-center justify-center">
+        <div className="bg-white rounded-lg shadow-md p-6 text-center max-w-md w-full">
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">No autenticado</h1>
+          <p className="text-gray-600 mb-6">Por favor inicia sesión primero</p>
+          <button
+            onClick={() => navigate('/login')}
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition"
+          >
+            Ir a Login
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    logout();
     navigate('/login');
   };
 
@@ -60,13 +63,15 @@ const ProfilePage: React.FC = () => {
     }
   };
 
-  if (!usuario) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-500">Cargando...</p>
-      </div>
-    );
-  }
+  const loginDate = new Date(user.loginTime);
+  const formattedLoginTime = loginDate.toLocaleString('es-ES', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
@@ -98,7 +103,7 @@ const ProfilePage: React.FC = () => {
             </div>
             <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
               <span className="text-white text-2xl font-bold">
-                {usuario.user.charAt(0).toUpperCase()}
+                {user.user.charAt(0).toUpperCase()}
               </span>
             </div>
           </div>
@@ -110,7 +115,7 @@ const ProfilePage: React.FC = () => {
               </label>
               <input
                 type="text"
-                value={usuario.user}
+                value={user.user}
                 disabled
                 className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-600"
               />
@@ -122,7 +127,7 @@ const ProfilePage: React.FC = () => {
               </label>
               <input
                 type="text"
-                value={new Date(usuario.loginTime).toLocaleString()}
+                value={formattedLoginTime}
                 disabled
                 className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-600"
               />
@@ -201,13 +206,43 @@ const ProfilePage: React.FC = () => {
         <div className="bg-white rounded-lg shadow-md p-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">Sesión</h2>
           <button
-            onClick={handleLogout}
+            onClick={() => setShowConfirmLogout(true)}
             className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition"
           >
             Cerrar Sesión
           </button>
         </div>
       </div>
+
+      {/* Modal de Confirmación */}
+      {showConfirmLogout && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-lg max-w-sm w-full">
+            <div className="bg-red-500 text-white p-6 rounded-t-lg">
+              <h2 className="text-2xl font-bold">¿Cerrar sesión?</h2>
+            </div>
+            <div className="p-6">
+              <p className="text-gray-700 mb-6">
+                ¿Estás seguro de que deseas cerrar tu sesión?
+              </p>
+              <div className="flex gap-4">
+                <button
+                  onClick={() => setShowConfirmLogout(false)}
+                  className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 font-bold py-2 px-4 rounded-lg transition"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition"
+                >
+                  Cerrar Sesión
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
