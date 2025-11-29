@@ -8,6 +8,7 @@ const authRoutes = require("./routes/auth");
 const statsRoutes = require("./routes/stats");
 const movimientosRoutes = require("./routes/movimientos");
 const categoriasRoutes = require("./routes/categorias");
+const productosRoutes = require("./routes/productos");
 
 const app = express();
 
@@ -21,7 +22,9 @@ app.use("/api/auth", authRoutes);
 
 app.use("/api/stats", statsRoutes);
 app.use("/api/movimientos", movimientosRoutes);
-app.use("/api/categorias", apiKeyMiddleware ,categoriasRoutes);
+app.use("/api/categorias", categoriasRoutes);
+app.use("/api/productos", productosRoutes);
+
 
 // Manejo de errores
 app.use(errorHandler);
