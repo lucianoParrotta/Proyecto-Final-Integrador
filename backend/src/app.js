@@ -6,6 +6,7 @@ const apiKeyMiddleware = require("./middlewares/apiKey");
 const errorHandler = require('./middlewares/errorHandler');
 const authRoutes = require("./routes/auth");
 const statsRoutes = require("./routes/stats");
+const movimientosRoutes = require("./routes/movimientos");
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(apiKeyMiddleware);
 app.use("/api/auth", authRoutes);
 app.use("/api", routes);          
 app.use("/api/stats", statsRoutes);
+app.use("/api/movimientos", movimientosRoutes);
 
 // Manejo de errores
 app.use(errorHandler);
