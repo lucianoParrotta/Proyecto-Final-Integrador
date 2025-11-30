@@ -1,11 +1,7 @@
 import { useState, useEffect } from 'react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-
-interface User {
-  user: string;
-  loginTime: string;
-}
+import { useAuth } from '../context/AuthContext';
 
 const LoginPage: React.FC = () => {
   const [usuario, setUsuario] = useState('');
@@ -13,16 +9,16 @@ const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { login, isAuthenticated } = useAuth();
 
   const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
   useEffect(() => {
     // Verificar si ya hay sesión activa
-    const userData = localStorage.getItem('user');
-    if (userData) {
+    if (isAuthenticated) {
       navigate('/home');
     }
-  }, [navigate]);
+  }, [isAuthenticated, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,12 +47,8 @@ const LoginPage: React.FC = () => {
 
       const data = await response.json();
 
-      // Guardar token y datos del usuario en localStorage
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify({
-        user: usuario,
-        loginTime: new Date().toISOString(),
-      }));
+      // Usar el contexto de autenticación
+      login(usuario, data.token);
 
       // Redirigir al home
       navigate('/home');
