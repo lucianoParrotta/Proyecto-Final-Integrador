@@ -60,17 +60,19 @@ const Sidebar: React.FC = () => {
           Proveedores
         </NavLink>
 
-        {/* Próximas funcionalidades (deshabilitadas) */}
+        {/* Operaciones */}
         <div className="mt-3 text-xs font-semibold text-slate-400 uppercase px-2">
-          Próximas funcionalidades
+          Operaciones
         </div>
 
-        <div
-          className={`${linkBase} ${linkInactive} opacity-50 cursor-not-allowed`}
-          title="No disponible aún"
+        <NavLink
+          to="/movimientos"
+          className={({ isActive }) =>
+            `${linkBase} ${isActive ? linkActive : linkInactive}`
+          }
         >
-          Reportes
-        </div>
+          Movimientos de Stock
+        </NavLink>
       </nav>
 
       {/* Footer */}

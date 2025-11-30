@@ -1,0 +1,416 @@
+{
+  "info": {
+    "_postman_id": "camilo-movimientos-stock",
+    "name": "Movimientos Stock - Tareas Camilo",
+    "description": "Colección de APIs para el módulo de Movimientos de Stock\nTareas asignadas a Camilo Dietrich",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. CRUD Movimientos",
+      "item": [
+        {
+          "name": "Obtener todos los movimientos (con filtros)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "tu_api_key_general_aqui",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/movimientos?page=1&limit=10&tipo=ENTRADA&productoId=1&fechaInicio=2024-01-01&fechaFin=2024-12-31",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "movimientos"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": false
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "disabled": false
+                },
+                {
+                  "key": "tipo",
+                  "value": "ENTRADA",
+                  "disabled": true
+                },
+                {
+                  "key": "productoId",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "fechaInicio",
+                  "value": "2024-01-01",
+                  "disabled": true
+                },
+                {
+                  "key": "fechaFin",
+                  "value": "2024-12-31",
+                  "disabled": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener movimiento por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "tu_api_key_general_aqui",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/movimientos/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "movimientos", "1"]
+            }
+          }
+        },
+        {
+          "name": "Crear nuevo movimiento (ENTRADA)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "tu_api_key_general_aqui",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productoId\": 1,\n  \"tipo\": \"ENTRADA\",\n  \"cantidad\": 50,\n  \"fecha\": \"2024-12-01T10:00:00\",\n  \"descripcion\": \"Compra a proveedor ABC\",\n  \"usuario\": \"Camilo\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/movimientos",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "movimientos"]
+            }
+          }
+        },
+        {
+          "name": "Crear nuevo movimiento (SALIDA)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "tu_api_key_general_aqui",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productoId\": 1,\n  \"tipo\": \"SALIDA\",\n  \"cantidad\": 10,\n  \"fecha\": \"2024-12-02T14:30:00\",\n  \"descripcion\": \"Venta al cliente XYZ\",\n  \"usuario\": \"Camilo\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/movimientos",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "movimientos"]
+            }
+          }
+        },
+        {
+          "name": "Actualizar movimiento",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "tu_api_key_general_aqui",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cantidad\": 60,\n  \"descripcion\": \"Compra corregida a proveedor ABC\",\n  \"usuario\": \"Camilo\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/movimientos/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "movimientos", "1"]
+            }
+          }
+        },
+        {
+          "name": "Eliminar movimiento",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "tu_api_key_general_aqui",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/movimientos/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "movimientos", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Reportes Especiales",
+      "item": [
+        {
+          "name": "Movimientos por período (REPORTE PDF/XLS)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "tu_api_key_general_aqui",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/movimientos/reportes/periodo?fechaInicio=2024-01-01&fechaFin=2024-12-31",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "movimientos", "reportes", "periodo"],
+              "query": [
+                {
+                  "key": "fechaInicio",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "fechaFin",
+                  "value": "2024-12-31"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Rotación por producto (ENTREGABLE CAMILO)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "tu_api_key_general_aqui",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/movimientos/reportes/rotacion?fechaInicio=2024-01-01&fechaFin=2024-12-31",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "movimientos", "reportes", "rotacion"],
+              "query": [
+                {
+                  "key": "fechaInicio",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "fechaFin",
+                  "value": "2024-12-31"
+                },
+                {
+                  "key": "productoId",
+                  "value": "1",
+                  "disabled": true
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Casos de uso - Testing",
+      "item": [
+        {
+          "name": "Caso 1: Crear movimiento con stock insuficiente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "tu_api_key_general_aqui",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productoId\": 1,\n  \"tipo\": \"SALIDA\",\n  \"cantidad\": 999999,\n  \"descripcion\": \"Intentar sacar más stock del disponible\",\n  \"usuario\": \"Testing\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/movimientos",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "movimientos"]
+            }
+          }
+        },
+        {
+          "name": "Caso 2: Filtrar movimientos por tipo ENTRADA",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "tu_api_key_general_aqui",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/movimientos?tipo=ENTRADA&page=1&limit=20",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "movimientos"],
+              "query": [
+                {
+                  "key": "tipo",
+                  "value": "ENTRADA"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Caso 3: Filtrar movimientos por producto",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "tu_api_key_general_aqui",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/movimientos?productoId=1&page=1&limit=20",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "movimientos"],
+              "query": [
+                {
+                  "key": "productoId",
+                  "value": "1"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Caso 4: Filtrar movimientos por rango de fechas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "tu_api_key_general_aqui",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/movimientos?fechaInicio=2024-12-01&fechaFin=2024-12-31&page=1&limit=50",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "movimientos"],
+              "query": [
+                {
+                  "key": "fechaInicio",
+                  "value": "2024-12-01"
+                },
+                {
+                  "key": "fechaFin",
+                  "value": "2024-12-31"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000/api",
+      "type": "string"
+    },
+    {
+      "key": "api_key",
+      "value": "tu_api_key_general_aqui",
+      "type": "string"
+    }
+  ]
+}
