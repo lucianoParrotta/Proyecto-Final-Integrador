@@ -1,4 +1,5 @@
 const MovimientoStock = require("../models/MovimientoStock");
+const Producto = require("../models/Producto");
 const { Op } = require("sequelize");
 
 // Obtener todos los movimientos
@@ -64,6 +65,13 @@ const crearMovimiento = async (req, res) => {
       return res.status(400).json({ error: "Tipo debe ser ENTRADA o SALIDA" });
     }
 
+    // Verificar que el producto existe
+    const producto = await Producto.findByPk(productoId);
+    if (!producto) {
+      return res.status(404).json({ error: "Producto no encontrado" });
+    }
+
+    // Crear el movimiento
     const movimiento = await MovimientoStock.create({
       productoId,
       tipo,
@@ -73,7 +81,26 @@ const crearMovimiento = async (req, res) => {
       usuario: usuario || "Sistema",
     });
 
-    res.status(201).json(movimiento);
+    // Actualizar stock del producto
+    const cantidadNumerica = parseFloat(cantidad);
+    if (tipo === "ENTRADA") {
+      producto.stock += cantidadNumerica;
+    } else if (tipo === "SALIDA") {
+      // Validar que hay suficiente stock
+      if (producto.stock < cantidadNumerica) {
+        // Eliminar el movimiento creado
+        await movimiento.destroy();
+        return res.status(400).json({ error: "Stock insuficiente para esta salida" });
+      }
+      producto.stock -= cantidadNumerica;
+    }
+
+    await producto.save();
+
+    res.status(201).json({
+      movimiento,
+      stockActual: producto.stock,
+    });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -91,13 +118,42 @@ const actualizarMovimiento = async (req, res) => {
       return res.status(404).json({ error: "Movimiento no encontrado" });
     }
 
-    if (tipo) {
-      if (!["ENTRADA", "SALIDA"].includes(tipo)) {
-        return res.status(400).json({ error: "Tipo debe ser ENTRADA o SALIDA" });
-      }
-      movimiento.tipo = tipo;
+    // Obtener el producto
+    const producto = await Producto.findByPk(movimiento.productoId);
+    if (!producto) {
+      return res.status(404).json({ error: "Producto no encontrado" });
     }
 
+    // Si cambia tipo o cantidad, necesitamos recalcular stock
+    const tipoAnterior = movimiento.tipo;
+    const cantidadAnterior = parseFloat(movimiento.cantidad);
+    const cantidadNueva = cantidad ? parseFloat(cantidad) : cantidadAnterior;
+    const tipoNuevo = tipo || tipoAnterior;
+
+    if (tipoNuevo !== tipoAnterior || cantidadNueva !== cantidadAnterior) {
+      // Revertir el impacto anterior
+      if (tipoAnterior === "ENTRADA") {
+        producto.stock -= cantidadAnterior;
+      } else {
+        producto.stock += cantidadAnterior;
+      }
+
+      // Aplicar nuevo impacto
+      if (tipoNuevo === "ENTRADA") {
+        producto.stock += cantidadNueva;
+      } else {
+        // Validar stock suficiente para salida
+        if (producto.stock < cantidadNueva) {
+          return res.status(400).json({ error: "Stock insuficiente para esta operación" });
+        }
+        producto.stock -= cantidadNueva;
+      }
+
+      await producto.save();
+    }
+
+    // Actualizar movimiento
+    if (tipo) movimiento.tipo = tipo;
     if (cantidad) movimiento.cantidad = cantidad;
     if (fecha) movimiento.fecha = fecha;
     if (descripcion) movimiento.descripcion = descripcion;
@@ -105,7 +161,10 @@ const actualizarMovimiento = async (req, res) => {
 
     await movimiento.save();
 
-    res.json(movimiento);
+    res.json({
+      movimiento,
+      stockActual: producto.stock,
+    });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -122,9 +181,32 @@ const eliminarMovimiento = async (req, res) => {
       return res.status(404).json({ error: "Movimiento no encontrado" });
     }
 
+    // Obtener el producto para revertir el cambio de stock
+    const producto = await Producto.findByPk(movimiento.productoId);
+    if (!producto) {
+      return res.status(404).json({ error: "Producto no encontrado" });
+    }
+
+    // Revertir el impacto en stock
+    const cantidadNumerica = parseFloat(movimiento.cantidad);
+    if (movimiento.tipo === "ENTRADA") {
+      producto.stock -= cantidadNumerica;
+    } else if (movimiento.tipo === "SALIDA") {
+      producto.stock += cantidadNumerica;
+    }
+
+    // Asegurar que el stock no sea negativo
+    if (producto.stock < 0) {
+      producto.stock = 0;
+    }
+
+    await producto.save();
     await movimiento.destroy();
 
-    res.json({ message: "Movimiento eliminado correctamente" });
+    res.json({
+      message: "Movimiento eliminado correctamente",
+      stockActual: producto.stock,
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
