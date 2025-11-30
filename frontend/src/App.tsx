@@ -10,6 +10,7 @@ import ProductoEditPage from "./pages/ProductoEditPage";
 import ProductoDetailPage from "./pages/ProductoDetailPage";
 import MovimientosListPage from "./pages/MovimientosListPage";
 import PrivateRoute from "./components/PrivateRoute";
+import CategoriasPages from "./pages/CategoriasPages";
 
 const App: React.FC = () => {
   return (
@@ -34,6 +35,7 @@ const App: React.FC = () => {
         <Route path="productos/:id/editar" element={<ProductoEditPage />} />
         <Route path="movimientos" element={<MovimientosListPage />} />
         <Route path="perfil" element={<ProfilePage />} />
+        <Route path="categorias" element={<CategoriasPages />} />
       </Route>
     </Routes>
   );

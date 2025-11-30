@@ -1,0 +1,98 @@
+.categorias-container {
+  padding: 20px;
+}
+
+.titulo {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.btn-primary {
+  background-color: #2563eb;
+  color: white;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.btn-primary:hover {
+  background-color: #1e50c9;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.tabla th,
+.tabla td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.tabla th {
+  background-color: #f5f5f5;
+  text-align: left;
+}
+
+.btn-edit {
+  background-color: #facc15;
+  color: black;
+  border: none;
+  padding: 6px 10px;
+  margin-right: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-edit:hover {
+  background-color: #eab308;
+}
+
+.btn-delete {
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-delete:hover {
+  background-color: #b91c1c;
+}
+
+.error {
+  color: red;
+  font-weight: bold;
+}
+
+.search-container {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.input-search {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.btn-clear {
+  background: #e74c3c;
+  color: white;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.btn-clear:hover {
+  opacity: 0.8;
+}
