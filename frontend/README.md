@@ -1,73 +1,178 @@
-# React + TypeScript + Vite
+# Frontend – Sistema de Gestión de Inventario (SGIG)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Este documento describe la estructura, instalación y funcionamiento del **frontend** del Proyecto Final Integrador.  
+El frontend implementa la interfaz completa del sistema SGIG, incluyendo login, dashboard, productos, movimientos y módulos prototipo.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+# Tecnologías principales
 
-## React Compiler
+- **React 18**
+- **TypeScript**
+- **Vite**
+- **Tailwind CSS**
+- **React Router DOM**
+- **Context API para autenticación**
+- **jspdf, jspdf-autotable, SheetJS (xlsx), FileSaver.js** para exportaciones
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+# Estructura del proyecto
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+frontend/
+│
+├── public/
+├── src/
+│   ├── api/
+│   ├── components/
+│   │   ├── categorias/
+│   │   ├── layouts/
+│   ├── context/
+│   ├── mocks/
+│   ├── pages/
+│   ├── styles/
+│   ├── utils/
+│   ├── App.tsx
+│   ├── main.tsx
+│   └── index.css
+│
+├── .env.example
+├── package.json
+├── tsconfig.json
+└── vite.config.ts
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+# Autenticación
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+El frontend utiliza:
+
+### ✔️ **Context API (`AuthContext`)**
+- Guarda el token JWT
+- Guarda el usuario autenticado
+- Protege rutas privadas
+- Persiste sesión en `localStorage`
+
+### ✔️ **PrivateRoute**
+Protege todas las rutas salvo `/login`.
+
+---
+
+# Variables de entorno
+
+Crear `/frontend/.env`:
+
 ```
+VITE_API_URL=http://localhost:3000/api
+VITE_API_KEY=mi_api_key_segura
+```
+
+---
+
+# Módulos principales
+
+## Login
+- Validación contra backend  
+- Guarda token y usuario  
+- Redirección automática  
+
+## Dashboard / Home
+- Muestra métricas reales desde backend:
+  - Productos totales  
+  - Stock bajo  
+  - Valorización de stock  
+  - Categorías  
+  - Proveedores  
+- Barras, estados, tarjetas dinámicas
+
+## Productos (mock)
+- Listado con filtros  
+- Vista responsiva  
+- Exportación PDF + XLS  
+- Modal de exportación  
+- CRUD visual prototipo  
+
+## Categorías (WIP)
+- Página agregada en prototipo  
+- Sidebar habilitado  
+- Próxima integración con backend  
+
+## Movimientos
+- **Conectado a backend real**  
+- Filtrado por:
+  - tipo  
+  - producto  
+  - fechas  
+  - búsqueda  
+- Exportación CSV  
+- Rotación de productos  
+- Modal crear/editar  
+- Tabla responsiva
+
+## Perfil del usuario
+- Cambiar contraseña  
+- Ver información de sesión  
+- Modal para cerrar sesión  
+
+---
+
+# ▶ Instalación y ejecución
+
+## 1. Instalar dependencias
+
+```
+cd frontend
+npm install
+```
+
+## 2. Ejecutar el servidor de desarrollo
+
+```
+npm run dev
+```
+
+Acceder en:
+
+👉 `http://localhost:5173`
+
+---
+
+# 🧪 Exportaciones disponibles
+
+## PDF
+- Usa `jspdf` + `jspdf-autotable`
+- Exporta tabla completa de productos (mock)
+
+## XLS
+- Usa `xlsx` (SheetJS)
+- Exporta tabla mock
+
+---
+
+# UI/UX implementado
+
+- Diseño consistente con:
+  - Dashboard
+  - Productos
+  - Movimientos
+  - Provedores
+  - Perfil
+- Estilo minimalista, moderno (inspirado en Tailwind UI / ShadCN)
+- Colores neutros + acentos azul/indigo
+- Componentes reutilizables
+
+---
+
+# 📎 Contacto técnico (equipo)
+
+- **Luciano Parrotta** – UI/UX + Productos + Integración  
+- **Federico Ruppel** – Categorías  
+- **Franco Muñoz** – Proveedores  
+- **Camilo Dietrich** – Movimientos + Autenticación
+
+---
+
+Proyecto académico – Universidad / Uso educativo.
+
