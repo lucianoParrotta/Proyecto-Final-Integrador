@@ -1,0 +1,264 @@
+{
+  "info": {
+    "name": "SGIG - Backend Auth + Productos",
+    "_postman_id": "sgig-backend-auth-productos-001",
+    "description": "Colección para probar autenticación (API Key + JWT) y el módulo de Productos del backend SGIG.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "api_key",
+      "value": "mi_api_key_segura"
+    },
+    {
+      "key": "admin_user",
+      "value": "admin"
+    },
+    {
+      "key": "admin_password",
+      "value": "admin123"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth - Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "x-api-key",
+            "value": "{{api_key}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/auth/login",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"user\": \"{{admin_user}}\",\n  \"password\": \"{{admin_password}}\"\n}"
+        },
+        "description": "Login de administrador usando usuario y password definidos en .env (ADMIN_USER y ADMIN_PASSWORD). Devuelve un JWT en el campo `token`."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "let jsonData = {};",
+              "try { jsonData = pm.response.json(); } catch (e) {}",
+              "if (jsonData.token) {",
+              "  pm.collectionVariables.set('token', jsonData.token);",
+              "  console.log('Token guardado en variables de colección');",
+              "} else {",
+              "  console.warn('No se encontró token en la respuesta');",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth - Perfil (/me)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "x-api-key",
+            "value": "{{api_key}}"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/auth/me",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "me"
+          ]
+        },
+        "description": "Devuelve los datos del usuario embebidos en el JWT (requiere token válido)."
+      }
+    },
+    {
+      "name": "Productos - Listar",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "x-api-key",
+            "value": "{{api_key}}"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/productos",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "productos"
+          ]
+        },
+        "description": "Listado de productos. Requiere API Key y token JWT válidos."
+      }
+    },
+    {
+      "name": "Productos - Obtener por ID",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "x-api-key",
+            "value": "{{api_key}}"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/productos/1",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "productos",
+            "1"
+          ]
+        },
+        "description": "Obtiene un producto específico por ID. Requiere API Key y token JWT válidos."
+      }
+    },
+    {
+      "name": "Productos - Crear",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "x-api-key",
+            "value": "{{api_key}}"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/productos",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "productos"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"codigo\": \"PRD-001\",\n  \"nombre\": \"Mate Imperial Negro\",\n  \"categoriaId\": 1,\n  \"proveedorId\": 1,\n  \"stock\": 10,\n  \"stockMinimo\": 5,\n  \"precio\": 15000,\n  \"estado\": \"Activo\",\n  \"descripcion\": \"Producto de prueba creado desde Postman.\"\n}"
+        },
+        "description": "Crea un nuevo producto. Requiere API Key, token JWT y que ya existan categoría/proveedor válidos."
+      }
+    },
+    {
+      "name": "Productos - Actualizar",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "x-api-key",
+            "value": "{{api_key}}"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/productos/1",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "productos",
+            "1"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Mate Imperial Negro (Editado)\",\n  \"stock\": 20,\n  \"precio\": 18000,\n  \"estado\": \"Activo\"\n}"
+        },
+        "description": "Actualiza un producto existente por ID. Requiere API Key y token JWT válidos."
+      }
+    },
+    {
+      "name": "Productos - Desactivar (DELETE lógico)",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "x-api-key",
+            "value": "{{api_key}}"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/productos/1",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "productos",
+            "1"
+          ]
+        },
+        "description": "Desactiva o elimina un producto por ID (según lo implementes en el backend). Requiere API Key y token JWT válidos."
+      }
+    }
+  ]
+}
