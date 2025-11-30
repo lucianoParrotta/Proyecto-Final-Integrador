@@ -4,7 +4,24 @@
   "framework": "vite",
   "outputDirectory": "frontend/dist",
   "env": {
-    "VITE_API_URL": "@vite_api_url",
-    "VITE_API_KEY": "@vite_api_key"
-  }
+    "VITE_API_URL": {
+      "description": "URL pública del backend en producción (ej: https://your-backend.onrender.com/api)"
+    },
+    "VITE_API_KEY": {
+      "description": "API Key para autenticación con el backend"
+    }
+  },
+  "functions": {
+    "api/**/*.js": {
+      "memory": 512,
+      "maxDuration": 10
+    }
+  },
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/",
+      "permanent": false
+    }
+  ]
 }
