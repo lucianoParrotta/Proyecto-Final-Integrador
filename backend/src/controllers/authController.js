@@ -54,7 +54,7 @@ const cambiarPassword = (req, res) => {
     return res.status(400).json({ error: "La contraseña debe tener al menos 6 caracteres" });
   }
 
-  // En un sistema real, aquí actualizarías la contraseña en BD
+  // En un sistema real, aquí se actualizaría la contraseña en BD
   // Por ahora solo validamos que sea correcta
   // Para cambiar la contraseña en .env manualmente
   

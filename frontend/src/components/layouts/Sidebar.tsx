@@ -22,7 +22,7 @@ const Sidebar: React.FC = () => {
             `${linkBase} ${isActive ? linkActive : linkInactive}`
           }
         >
-          🏠 Dashboard
+          Dashboard
         </NavLink>
 
         <div className="mt-3 text-xs font-semibold text-slate-400 uppercase px-2">
@@ -35,7 +35,7 @@ const Sidebar: React.FC = () => {
             `${linkBase} ${isActive ? linkActive : linkInactive}`
           }
         >
-          📦 Productos
+          Productos
         </NavLink>
 
         <NavLink
@@ -44,7 +44,7 @@ const Sidebar: React.FC = () => {
             `${linkBase} ${isActive ? linkActive : linkInactive}`
           }
         >
-          🔄 Movimientos
+          Movimientos
         </NavLink>
 
         <div className="mt-3 text-xs font-semibold text-slate-400 uppercase px-2">
@@ -55,21 +55,21 @@ const Sidebar: React.FC = () => {
           className={`${linkBase} ${linkInactive} opacity-50 cursor-not-allowed`}
           title="No disponible aún"
         >
-          📋 Categorías
+          Categorías
         </div>
 
         <div
           className={`${linkBase} ${linkInactive} opacity-50 cursor-not-allowed`}
           title="No disponible aún"
         >
-          🏢 Proveedores
+          Proveedores
         </div>
 
         <div
           className={`${linkBase} ${linkInactive} opacity-50 cursor-not-allowed`}
           title="No disponible aún"
         >
-          📊 Reportes
+          Reportes
         </div>
       </nav>
 

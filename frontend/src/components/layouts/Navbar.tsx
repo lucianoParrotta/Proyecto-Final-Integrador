@@ -41,7 +41,7 @@ const Navbar: React.FC = () => {
                 }}
                 className="w-full text-left px-4 py-2 text-slate-700 hover:bg-slate-50 flex items-center gap-2"
               >
-                👤 Mi Perfil
+                Mi Perfil
               </button>
               <hr className="my-1" />
               <button
@@ -51,7 +51,7 @@ const Navbar: React.FC = () => {
                 }}
                 className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 flex items-center gap-2"
               >
-                🚪 Cerrar sesión
+                Cerrar sesión
               </button>
             </div>
           )}

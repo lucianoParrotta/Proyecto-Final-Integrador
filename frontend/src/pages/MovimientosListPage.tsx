@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
-import React from 'react';
+import { useState, useEffect } from "react";
+import React from "react";
 
 interface Movimiento {
   id: number;
   productoId: number;
-  tipo: 'ENTRADA' | 'SALIDA';
+  tipo: "ENTRADA" | "SALIDA";
   cantidad: number;
   fecha: string;
   descripcion: string;
@@ -31,30 +31,32 @@ const MovimientosListPage: React.FC = () => {
   const [limit] = useState(10);
 
   // Filtros
-  const [filtroTipo, setFiltroTipo] = useState('');
-  const [filtroProducto, setFiltroProducto] = useState('');
-  const [filtroFechaInicio, setFiltroFechaInicio] = useState('');
-  const [filtroFechaFin, setFiltroFechaFin] = useState('');
-  const [busqueda, setBusqueda] = useState('');
+  const [filtroTipo, setFiltroTipo] = useState("");
+  const [filtroProducto, setFiltroProducto] = useState("");
+  const [filtroFechaInicio, setFiltroFechaInicio] = useState("");
+  const [filtroFechaFin, setFiltroFechaFin] = useState("");
+  const [busqueda, setBusqueda] = useState("");
 
   // Modal
   const [mostrarModal, setMostrarModal] = useState(false);
   const [editando, setEditando] = useState(false);
-  const [movimientoSeleccionado, setMovimientoSeleccionado] = useState<Movimiento | null>(null);
+  const [movimientoSeleccionado, setMovimientoSeleccionado] =
+    useState<Movimiento | null>(null);
 
   // Formulario
   const [formulario, setFormulario] = useState({
-    productoId: '',
-    tipo: 'ENTRADA',
-    cantidad: '',
-    descripcion: '',
-    usuario: '',
+    productoId: "",
+    tipo: "ENTRADA",
+    cantidad: "",
+    descripcion: "",
+    usuario: "",
   });
 
-  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
   useEffect(() => {
     cargarMovimientos();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, filtroTipo, filtroProducto, filtroFechaInicio, filtroFechaFin]);
 
   const cargarMovimientos = async () => {
@@ -67,14 +69,14 @@ const MovimientosListPage: React.FC = () => {
         limit: limit.toString(),
       });
 
-      if (filtroTipo) params.append('tipo', filtroTipo);
-      if (filtroProducto) params.append('productoId', filtroProducto);
-      if (filtroFechaInicio) params.append('fechaInicio', filtroFechaInicio);
-      if (filtroFechaFin) params.append('fechaFin', filtroFechaFin);
+      if (filtroTipo) params.append("tipo", filtroTipo);
+      if (filtroProducto) params.append("productoId", filtroProducto);
+      if (filtroFechaInicio) params.append("fechaInicio", filtroFechaInicio);
+      if (filtroFechaFin) params.append("fechaFin", filtroFechaFin);
 
       const response = await fetch(`${apiUrl}/movimientos?${params}`, {
         headers: {
-          'x-api-key': import.meta.env.VITE_API_KEY || 'test-key',
+          "x-api-key": import.meta.env.VITE_API_KEY || "test-key",
         },
       });
 
@@ -88,9 +90,10 @@ const MovimientosListPage: React.FC = () => {
       setTotalMovimientos(data.total);
       setPage(data.page);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
+      const errorMessage =
+        err instanceof Error ? err.message : "Error desconocido";
       setError(errorMessage);
-      console.error('Error cargando movimientos:', err);
+      console.error("Error cargando movimientos:", err);
     } finally {
       setLoading(false);
     }
@@ -99,7 +102,7 @@ const MovimientosListPage: React.FC = () => {
   const handleGuardar = async () => {
     try {
       if (!formulario.productoId || !formulario.cantidad) {
-        setError('Por favor completa los campos requeridos');
+        setError("Por favor completa los campos requeridos");
         return;
       }
 
@@ -107,13 +110,13 @@ const MovimientosListPage: React.FC = () => {
         ? `${apiUrl}/movimientos/${movimientoSeleccionado?.id}`
         : `${apiUrl}/movimientos`;
 
-      const method = editando ? 'PUT' : 'POST';
+      const method = editando ? "PUT" : "POST";
 
       const response = await fetch(url, {
         method,
         headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': import.meta.env.VITE_API_KEY || 'test-key',
+          "Content-Type": "application/json",
+          "x-api-key": import.meta.env.VITE_API_KEY || "test-key",
         },
         body: JSON.stringify(formulario),
       });
@@ -124,17 +127,18 @@ const MovimientosListPage: React.FC = () => {
 
       setMostrarModal(false);
       setFormulario({
-        productoId: '',
-        tipo: 'ENTRADA',
-        cantidad: '',
-        descripcion: '',
-        usuario: '',
+        productoId: "",
+        tipo: "ENTRADA",
+        cantidad: "",
+        descripcion: "",
+        usuario: "",
       });
       setEditando(false);
       setMovimientoSeleccionado(null);
       cargarMovimientos();
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
+      const errorMessage =
+        err instanceof Error ? err.message : "Error desconocido";
       setError(errorMessage);
     }
   };
@@ -145,21 +149,22 @@ const MovimientosListPage: React.FC = () => {
       productoId: movimiento.productoId.toString(),
       tipo: movimiento.tipo,
       cantidad: movimiento.cantidad.toString(),
-      descripcion: movimiento.descripcion || '',
-      usuario: movimiento.usuario || '',
+      descripcion: movimiento.descripcion || "",
+      usuario: movimiento.usuario || "",
     });
     setEditando(true);
     setMostrarModal(true);
   };
 
   const handleEliminar = async (id: number) => {
-    if (!window.confirm('¿Confirmas que deseas eliminar este movimiento?')) return;
+    if (!window.confirm("¿Confirmas que deseas eliminar este movimiento?"))
+      return;
 
     try {
       const response = await fetch(`${apiUrl}/movimientos/${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
         headers: {
-          'x-api-key': import.meta.env.VITE_API_KEY || 'test-key',
+          "x-api-key": import.meta.env.VITE_API_KEY || "test-key",
         },
       });
 
@@ -169,18 +174,19 @@ const MovimientosListPage: React.FC = () => {
 
       cargarMovimientos();
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
+      const errorMessage =
+        err instanceof Error ? err.message : "Error desconocido";
       setError(errorMessage);
     }
   };
 
   const handleNuevoMovimiento = () => {
     setFormulario({
-      productoId: '',
-      tipo: 'ENTRADA',
-      cantidad: '',
-      descripcion: '',
-      usuario: '',
+      productoId: "",
+      tipo: "ENTRADA",
+      cantidad: "",
+      descripcion: "",
+      usuario: "",
     });
     setEditando(false);
     setMovimientoSeleccionado(null);
@@ -190,11 +196,11 @@ const MovimientosListPage: React.FC = () => {
   const handleCancelar = () => {
     setMostrarModal(false);
     setFormulario({
-      productoId: '',
-      tipo: 'ENTRADA',
-      cantidad: '',
-      descripcion: '',
-      usuario: '',
+      productoId: "",
+      tipo: "ENTRADA",
+      cantidad: "",
+      descripcion: "",
+      usuario: "",
     });
     setEditando(false);
     setMovimientoSeleccionado(null);
@@ -203,148 +209,196 @@ const MovimientosListPage: React.FC = () => {
   const exportarPDF = async () => {
     try {
       const params = new URLSearchParams();
-      if (filtroFechaInicio) params.append('fechaInicio', filtroFechaInicio);
-      if (filtroFechaFin) params.append('fechaFin', filtroFechaFin);
+      if (filtroFechaInicio) params.append("fechaInicio", filtroFechaInicio);
+      if (filtroFechaFin) params.append("fechaFin", filtroFechaFin);
 
-      const response = await fetch(`${apiUrl}/movimientos/reportes/periodo?${params}`, {
-        headers: {
-          'x-api-key': import.meta.env.VITE_API_KEY || 'test-key',
-        },
-      });
+      const response = await fetch(
+        `${apiUrl}/movimientos/reportes/periodo?${params}`,
+        {
+          headers: {
+            "x-api-key": import.meta.env.VITE_API_KEY || "test-key",
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`Error ${response.status}`);
       }
 
-      // Simulación de descarga PDF
       const data = await response.json();
       const csvContent = [
-        ['ID', 'Producto ID', 'Tipo', 'Cantidad', 'Fecha', 'Descripción', 'Usuario'],
+        [
+          "ID",
+          "Producto ID",
+          "Tipo",
+          "Cantidad",
+          "Fecha",
+          "Descripción",
+          "Usuario",
+        ],
         ...data.map((mov: Movimiento) => [
           mov.id,
           mov.productoId,
           mov.tipo,
           mov.cantidad,
           new Date(mov.fecha).toLocaleDateString(),
-          mov.descripcion || '',
-          mov.usuario || '',
+          mov.descripcion || "",
+          mov.usuario || "",
         ]),
       ];
 
-      const csv = csvContent.map(row => row.join(',')).join('\n');
-      const blob = new Blob([csv], { type: 'text/csv' });
+      const csv = csvContent.map((row) => row.join(",")).join("\n");
+      const blob = new Blob([csv], { type: "text/csv" });
       const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
-      link.download = `movimientos-${new Date().toISOString().split('T')[0]}.csv`;
+      link.download = `movimientos-${
+        new Date().toISOString().split("T")[0]
+      }.csv`;
       link.click();
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
+      const errorMessage =
+        err instanceof Error ? err.message : "Error desconocido";
       setError(errorMessage);
     }
   };
 
   const exportarRotacion = async () => {
     try {
-      const response = await fetch(`${apiUrl}/movimientos/reportes/rotacion`, {
-        headers: {
-          'x-api-key': import.meta.env.VITE_API_KEY || 'test-key',
-        },
-      });
+      const response = await fetch(
+        `${apiUrl}/movimientos/reportes/rotacion`,
+        {
+          headers: {
+            "x-api-key": import.meta.env.VITE_API_KEY || "test-key",
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`Error ${response.status}`);
       }
 
       const data = await response.json();
-      
+
       const csvContent = [
-        ['Producto ID', 'Total Entradas', 'Total Salidas', 'Rotación (Salidas/Entradas)'],
+        [
+          "Producto ID",
+          "Total Entradas",
+          "Total Salidas",
+          "Rotación (Salidas/Entradas)",
+        ],
         ...data.map((rot: any) => [
           rot.productoId,
           rot.totalEntradas,
           rot.totalSalidas,
-          (rot.totalEntradas > 0 ? (rot.totalSalidas / rot.totalEntradas).toFixed(2) : '0.00'),
+          rot.totalEntradas > 0
+            ? (rot.totalSalidas / rot.totalEntradas).toFixed(2)
+            : "0.00",
         ]),
       ];
 
-      const csv = csvContent.map(row => row.join(',')).join('\n');
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const csv = csvContent.map((row) => row.join(",")).join("\n");
+      const blob = new Blob([csv], {
+        type: "text/csv;charset=utf-8;",
+      });
       const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
-      link.download = `rotacion-productos-${new Date().toISOString().split('T')[0]}.csv`;
+      link.download = `rotacion-productos-${
+        new Date().toISOString().split("T")[0]
+      }.csv`;
       link.click();
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
+      const errorMessage =
+        err instanceof Error ? err.message : "Error desconocido";
       setError(errorMessage);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">Movimientos de Stock</h1>
-          <p className="text-gray-600">Gestiona las entradas y salidas de stock</p>
+    <div className="space-y-6">
+      {/* Encabezado */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-800">
+            Movimientos de Stock
+          </h1>
+          <p className="text-slate-500 text-sm">
+            Gestiona las entradas y salidas de stock. Esta vista se conecta al
+            backend real para registrar los movimientos.
+          </p>
         </div>
 
-        {/* Alertas */}
-        {error && (
-          <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-            {error}
-          </div>
-        )}
+        <div className="flex gap-2">
+          <button
+            onClick={exportarPDF}
+            className="px-3 py-2 rounded-md border border-slate-300 text-sm text-slate-700 hover:bg-slate-50 inline-flex items-center gap-1"
+          >
+            Exportar movimientos
+          </button>
+          <button
+            onClick={exportarRotacion}
+            className="px-3 py-2 rounded-md border border-slate-300 text-sm text-slate-700 hover:bg-slate-50 inline-flex items-center gap-1"
+          >
+            Reporte rotación
+          </button>
+          <button
+            onClick={handleNuevoMovimiento}
+            className="px-3 py-2 rounded-md bg-slate-900 text-sm text-white hover:bg-slate-800 inline-flex items-center justify-center"
+          >
+            + Nuevo movimiento
+          </button>
+        </div>
+      </div>
 
-        {/* Botones y Filtros */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <div className="flex justify-between items-center mb-4">
-            <button
-              onClick={handleNuevoMovimiento}
-              className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition"
-            >
-              + Nuevo Movimiento
-            </button>
-            <div className="flex gap-2">
-              <button
-                onClick={exportarPDF}
-                className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition"
-              >
-                📥 Exportar Movimientos
-              </button>
-              <button
-                onClick={exportarRotacion}
-                className="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded-lg transition"
-              >
-                📊 Reporte Rotación
-              </button>
-            </div>
-          </div>
+      {/* Alertas */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
+          {error}
+        </div>
+      )}
 
-          {/* Filtros */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+      {/* Filtros */}
+      <section className="bg-white border border-slate-200 rounded-lg shadow-sm p-4 space-y-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4">
+          {/* Búsqueda */}
+          <div className="col-span-1">
+            <label className="block text-xs font-medium text-slate-500 mb-1">
+              Buscar
+            </label>
             <input
               type="text"
-              placeholder="Buscar..."
+              placeholder="Buscar por descripción, usuario..."
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400"
             />
+          </div>
 
+          {/* Tipo */}
+          <div>
+            <label className="block text-xs font-medium text-slate-500 mb-1">
+              Tipo
+            </label>
             <select
               value={filtroTipo}
               onChange={(e) => {
                 setFiltroTipo(e.target.value);
                 setPage(1);
               }}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400"
             >
               <option value="">Todos los tipos</option>
               <option value="ENTRADA">Entrada</option>
               <option value="SALIDA">Salida</option>
             </select>
+          </div>
 
+          {/* Producto ID */}
+          <div>
+            <label className="block text-xs font-medium text-slate-500 mb-1">
+              Producto ID
+            </label>
             <input
               type="number"
               placeholder="Producto ID"
@@ -353,9 +407,15 @@ const MovimientosListPage: React.FC = () => {
                 setFiltroProducto(e.target.value);
                 setPage(1);
               }}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400"
             />
+          </div>
 
+          {/* Fecha desde */}
+          <div>
+            <label className="block text-xs font-medium text-slate-500 mb-1">
+              Desde
+            </label>
             <input
               type="date"
               value={filtroFechaInicio}
@@ -363,9 +423,15 @@ const MovimientosListPage: React.FC = () => {
                 setFiltroFechaInicio(e.target.value);
                 setPage(1);
               }}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400"
             />
+          </div>
 
+          {/* Fecha hasta */}
+          <div>
+            <label className="block text-xs font-medium text-slate-500 mb-1">
+              Hasta
+            </label>
             <input
               type="date"
               value={filtroFechaFin}
@@ -373,199 +439,269 @@ const MovimientosListPage: React.FC = () => {
                 setFiltroFechaFin(e.target.value);
                 setPage(1);
               }}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400"
             />
           </div>
         </div>
 
-        {/* Tabla */}
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          {loading ? (
-            <div className="p-8 text-center">
-              <p className="text-gray-500">Cargando movimientos...</p>
-            </div>
-          ) : movimientos.length === 0 ? (
-            <div className="p-8 text-center">
-              <p className="text-gray-500">No hay movimientos registrados</p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-sm font-semibold">ID</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold">Producto</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold">Tipo</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold">Cantidad</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold">Fecha</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold">Usuario</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {movimientos.map((movimiento, index) => (
+        <p className="text-xs text-slate-400">
+          Los filtros se aplican sobre los datos reales devueltos por la API de
+          movimientos.
+        </p>
+      </section>
+
+      {/* Tabla de movimientos */}
+      <section className="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden">
+        {/* Header tabla */}
+        <div className="border-b border-slate-200 px-4 py-2 flex items-center justify-between text-xs text-slate-500">
+          <span>
+            Mostrando <strong>{movimientos.length}</strong> de{" "}
+            <strong>{totalMovimientos}</strong> movimientos
+          </span>
+          <span>Datos en tiempo real desde la API</span>
+        </div>
+
+        {loading ? (
+          <div className="p-8 text-center text-sm text-slate-500">
+            Cargando movimientos...
+          </div>
+        ) : movimientos.length === 0 ? (
+          <div className="p-8 text-center text-sm text-slate-500">
+            No hay movimientos registrados con los filtros actuales.
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm">
+              <thead className="bg-slate-50 border-b border-slate-200">
+                <tr>
+                  <th className="px-3 py-2 text-left text-xs font-semibold text-slate-500">
+                    ID
+                  </th>
+                  <th className="px-3 py-2 text-left text-xs font-semibold text-slate-500">
+                    Producto
+                  </th>
+                  <th className="px-3 py-2 text-left text-xs font-semibold text-slate-500">
+                    Tipo
+                  </th>
+                  <th className="px-3 py-2 text-right text-xs font-semibold text-slate-500">
+                    Cantidad
+                  </th>
+                  <th className="px-3 py-2 text-left text-xs font-semibold text-slate-500">
+                    Fecha
+                  </th>
+                  <th className="px-3 py-2 text-left text-xs font-semibold text-slate-500">
+                    Usuario
+                  </th>
+                  <th className="px-3 py-2 text-right text-xs font-semibold text-slate-500">
+                    Acciones
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {movimientos
+                  .filter((m) => {
+                    if (!busqueda.trim()) return true;
+                    const text = `${m.descripcion ?? ""} ${
+                      m.usuario ?? ""
+                    }`.toLowerCase();
+                    return text.includes(busqueda.toLowerCase());
+                  })
+                  .map((movimiento) => (
                     <tr
                       key={movimiento.id}
-                      className={`${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'} hover:bg-gray-100 border-b`}
+                      className="border-b border-slate-100 hover:bg-slate-50"
                     >
-                      <td className="px-6 py-4 text-sm font-medium text-gray-900">{movimiento.id}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{movimiento.productoId}</td>
-                      <td className="px-6 py-4 text-sm">
+                      <td className="px-3 py-2 text-xs text-slate-700">
+                        {movimiento.id}
+                      </td>
+                      <td className="px-3 py-2 text-xs text-slate-700">
+                        {movimiento.productoId}
+                      </td>
+                      <td className="px-3 py-2 text-xs">
                         <span
-                          className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                            movimiento.tipo === 'ENTRADA'
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-red-100 text-red-800'
-                          }`}
+                          className={
+                            "inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium " +
+                            (movimiento.tipo === "ENTRADA"
+                              ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                              : "bg-rose-50 text-rose-700 border border-rose-200")
+                          }
                         >
                           {movimiento.tipo}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{movimiento.cantidad}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
+                      <td className="px-3 py-2 text-xs text-right text-slate-700">
+                        {movimiento.cantidad}
+                      </td>
+                      <td className="px-3 py-2 text-xs text-slate-600">
                         {new Date(movimiento.fecha).toLocaleDateString()}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{movimiento.usuario}</td>
-                      <td className="px-6 py-4 text-sm">
+                      <td className="px-3 py-2 text-xs text-slate-600">
+                        {movimiento.usuario || "-"}
+                      </td>
+                      <td className="px-3 py-2 text-xs text-right">
                         <button
                           onClick={() => handleEditar(movimiento)}
-                          className="text-blue-500 hover:text-blue-700 font-semibold mr-3"
+                          className="px-2 py-1 rounded-md border border-slate-300 text-slate-700 hover:bg-slate-50 mr-1"
                         >
                           Editar
                         </button>
                         <button
                           onClick={() => handleEliminar(movimiento.id)}
-                          className="text-red-500 hover:text-red-700 font-semibold"
+                          className="px-2 py-1 rounded-md border border-slate-200 text-slate-400 hover:bg-rose-50 hover:text-rose-700"
                         >
                           Eliminar
                         </button>
                       </td>
                     </tr>
                   ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+              </tbody>
+            </table>
+          </div>
+        )}
 
-          {/* Paginación */}
-          {totalPages > 1 && (
-            <div className="bg-gray-50 px-6 py-4 border-t flex justify-between items-center">
-              <p className="text-sm text-gray-600">
-                Mostrando {movimientos.length} de {totalMovimientos} movimientos
-              </p>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setPage(Math.max(1, page - 1))}
-                  disabled={page === 1}
-                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 hover:bg-gray-300"
-                >
-                  Anterior
-                </button>
-                <span className="px-4 py-2 text-gray-700">
-                  Página {page} de {totalPages}
-                </span>
-                <button
-                  onClick={() => setPage(Math.min(totalPages, page + 1))}
-                  disabled={page === totalPages}
-                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 hover:bg-gray-300"
-                >
-                  Siguiente
-                </button>
-              </div>
+        {/* Paginación */}
+        {totalPages > 1 && (
+          <div className="border-t border-slate-200 px-4 py-2 flex items-center justify-between text-xs text-slate-500">
+            <span>
+              Página {page} de {totalPages}
+            </span>
+            <div className="inline-flex gap-1">
+              <button
+                onClick={() => setPage(Math.max(1, page - 1))}
+                disabled={page === 1}
+                className="px-2 py-1 rounded-md border border-slate-200 text-slate-500 disabled:opacity-40 hover:bg-slate-50"
+              >
+                Anterior
+              </button>
+              <button className="px-2 py-1 rounded-md border border-slate-900 bg-slate-900 text-white">
+                {page}
+              </button>
+              <button
+                onClick={() => setPage(Math.min(totalPages, page + 1))}
+                disabled={page === totalPages}
+                className="px-2 py-1 rounded-md border border-slate-200 text-slate-500 disabled:opacity-40 hover:bg-slate-50"
+              >
+                Siguiente
+              </button>
             </div>
-          )}
-        </div>
-      </div>
+          </div>
+        )}
+      </section>
 
       {/* Modal */}
       {mostrarModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-lg max-w-md w-full">
-            <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white p-6 rounded-t-lg">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-lg max-w-md w-full overflow-hidden">
+            <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white p-6">
               <h2 className="text-2xl font-bold">
-                {editando ? 'Editar Movimiento' : 'Nuevo Movimiento'}
+                {editando ? "Editar movimiento" : "Nuevo movimiento"}
               </h2>
+              <p className="text-sm text-blue-50/80 mt-1">
+                Completa los datos del movimiento de stock.
+              </p>
             </div>
 
-            <div className="p-6">
-              <div className="mb-4">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Producto ID *</label>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  Producto ID *
+                </label>
                 <input
                   type="number"
                   value={formulario.productoId}
                   onChange={(e) =>
-                    setFormulario({ ...formulario, productoId: e.target.value })
+                    setFormulario({
+                      ...formulario,
+                      productoId: e.target.value,
+                    })
                   }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900/10"
                   required
                 />
               </div>
 
-              <div className="mb-4">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Tipo *</label>
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  Tipo *
+                </label>
                 <select
                   value={formulario.tipo}
                   onChange={(e) =>
                     setFormulario({
                       ...formulario,
-                      tipo: e.target.value as 'ENTRADA' | 'SALIDA',
+                      tipo: e.target.value as "ENTRADA" | "SALIDA",
                     })
                   }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900/10"
                 >
                   <option value="ENTRADA">Entrada</option>
                   <option value="SALIDA">Salida</option>
                 </select>
               </div>
 
-              <div className="mb-4">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Cantidad *</label>
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  Cantidad *
+                </label>
                 <input
                   type="number"
-                  step="0.01"
+                  step="1"
                   value={formulario.cantidad}
                   onChange={(e) =>
-                    setFormulario({ ...formulario, cantidad: e.target.value })
+                    setFormulario({
+                      ...formulario,
+                      cantidad: e.target.value,
+                    })
                   }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900/10"
                   required
                 />
               </div>
 
-              <div className="mb-4">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Descripción</label>
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  Descripción
+                </label>
                 <textarea
                   value={formulario.descripcion}
                   onChange={(e) =>
-                    setFormulario({ ...formulario, descripcion: e.target.value })
+                    setFormulario({
+                      ...formulario,
+                      descripcion: e.target.value,
+                    })
                   }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900/10"
                   rows={3}
                 />
               </div>
 
-              <div className="mb-4">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Usuario</label>
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  Usuario
+                </label>
                 <input
                   type="text"
                   value={formulario.usuario}
                   onChange={(e) =>
-                    setFormulario({ ...formulario, usuario: e.target.value })
+                    setFormulario({
+                      ...formulario,
+                      usuario: e.target.value,
+                    })
                   }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900/10"
                 />
               </div>
 
-              <div className="flex gap-4">
+              <div className="flex gap-3 pt-2">
                 <button
                   onClick={handleGuardar}
-                  className="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition"
+                  className="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2 px-4 rounded-lg text-sm"
                 >
                   Guardar
                 </button>
                 <button
                   onClick={handleCancelar}
-                  className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 font-bold py-2 px-4 rounded-lg transition"
+                  className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2 px-4 rounded-lg text-sm"
                 >
                   Cancelar
                 </button>

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 interface StatsData {
   totalProductos: number;
   productosStockBajo: number;
-  valorizacionStock: number | null;
+  valorizacionStock: number | string | null;
   cantidadPorCategoria: Array<{ nombre: string; cantidad: number }>;
   cantidadPorProveedor: Array<{ nombre: string; cantidad: number }>;
   rotacion: Array<{ productoId: number; rotacion: number }>;
@@ -13,6 +13,16 @@ const HomePage: React.FC = () => {
   const [stats, setStats] = useState<StatsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const formatMoney = (value: number | string | null | undefined) => {
+    const num = Number(value ?? 0);
+    if (Number.isNaN(num)) return "0.00";
+
+    return num.toLocaleString("es-AR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  };
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -109,7 +119,7 @@ const HomePage: React.FC = () => {
               Valorización del stock
             </div>
             <div className="mt-2 text-2xl font-bold text-blue-600">
-              ${stats.valorizacionStock ? stats.valorizacionStock.toFixed(2) : "0.00"}
+              ${formatMoney(stats.valorizacionStock)}
             </div>
             <div className="mt-1 text-xs text-slate-500">
               Valor total en inventario.
@@ -193,19 +203,19 @@ const HomePage: React.FC = () => {
                 </li>
               )}
 
-              {stats.valorizacionStock && stats.valorizacionStock > 0 && (
-                <li className="flex items-start gap-2">
-                  <span className="mt-1 h-2 w-2 rounded-full bg-blue-500" />
-                  <div>
-                    <p className="text-slate-700">
-                      Valorización del inventario: ${stats.valorizacionStock.toFixed(2)}
-                    </p>
-                    <p className="text-xs text-slate-400">
-                      Valor total en stock disponible.
-                    </p>
-                  </div>
-                </li>
-              )}
+                {Number(stats.valorizacionStock ?? 0) > 0 && (
+                  <li className="flex items-start gap-2">
+                    <span className="mt-1 h-2 w-2 rounded-full bg-blue-500" />
+                    <div>
+                      <p className="text-slate-700">
+                        Valorización del inventario: ${formatMoney(stats.valorizacionStock)}
+                      </p>
+                      <p className="text-xs text-slate-400">
+                        Valor total en stock disponible.
+                      </p>
+                    </div>
+                  </li>
+                )}
 
               {stats.productosStockBajo === 0 && (
                 <li className="flex items-start gap-2">

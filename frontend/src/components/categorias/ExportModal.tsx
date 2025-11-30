@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import "../styles/ExportModal.styles.css";
+import "../../styles/ExportModal.styles.css";
 
 interface ExportModalProps {
   isOpen: boolean;
