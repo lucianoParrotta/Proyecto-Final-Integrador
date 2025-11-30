@@ -1,6 +1,69 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+
+interface StatsData {
+  totalProductos: number;
+  productosStockBajo: number;
+  valorizacionStock: number | null;
+  cantidadPorCategoria: Array<{ nombre: string; cantidad: number }>;
+  cantidadPorProveedor: Array<{ nombre: string; cantidad: number }>;
+  rotacion: Array<{ productoId: number; rotacion: number }>;
+}
 
 const HomePage: React.FC = () => {
+  const [stats, setStats] = useState<StatsData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/stats/dashboard`,
+          {
+            headers: {
+              "x-api-key": import.meta.env.VITE_API_KEY,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Error al cargar estadísticas");
+        }
+
+        const data = await response.json();
+        setStats(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Error desconocido");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-800">Dashboard general</h1>
+          <p className="text-slate-500 text-sm">Cargando estadísticas...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !stats) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-800">Dashboard general</h1>
+          <p className="text-red-500 text-sm">{error || "No se pudieron cargar las estadísticas"}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Título principal */}
@@ -23,7 +86,7 @@ const HomePage: React.FC = () => {
             <div className="text-xs font-medium text-slate-400 uppercase">
               Productos totales
             </div>
-            <div className="mt-2 text-2xl font-bold text-slate-800">124</div>
+            <div className="mt-2 text-2xl font-bold text-slate-800">{stats.totalProductos}</div>
             <div className="mt-1 text-xs text-slate-500">
               Incluye todos los depósitos.
             </div>
@@ -34,7 +97,7 @@ const HomePage: React.FC = () => {
             <div className="text-xs font-medium text-amber-500 uppercase">
               Stock bajo
             </div>
-            <div className="mt-2 text-2xl font-bold text-amber-600">7</div>
+            <div className="mt-2 text-2xl font-bold text-amber-600">{stats.productosStockBajo}</div>
             <div className="mt-1 text-xs text-slate-500">
               Productos por debajo del mínimo.
             </div>
@@ -42,23 +105,25 @@ const HomePage: React.FC = () => {
 
           {/* Card 3 */}
           <div className="bg-white border border-slate-200 rounded-lg shadow-sm p-4">
-            <div className="text-xs font-medium text-slate-400 uppercase">
-              Movimientos hoy
+            <div className="text-xs font-medium text-blue-500 uppercase">
+              Valorización del stock
             </div>
-            <div className="mt-2 text-2xl font-bold text-emerald-600">23</div>
+            <div className="mt-2 text-2xl font-bold text-blue-600">
+              ${stats.valorizacionStock ? stats.valorizacionStock.toFixed(2) : "0.00"}
+            </div>
             <div className="mt-1 text-xs text-slate-500">
-              Entradas y salidas registradas.
+              Valor total en inventario.
             </div>
           </div>
 
           {/* Card 4 */}
           <div className="bg-white border border-slate-200 rounded-lg shadow-sm p-4">
             <div className="text-xs font-medium text-slate-400 uppercase">
-              Proveedores activos
+              Categorías
             </div>
-            <div className="mt-2 text-2xl font-bold text-slate-800">18</div>
+            <div className="mt-2 text-2xl font-bold text-slate-800">{stats.cantidadPorCategoria.length}</div>
             <div className="mt-1 text-xs text-slate-500">
-              Con operaciones en los últimos 30 días.
+              Categorías registradas.
             </div>
           </div>
         </div>
@@ -67,34 +132,35 @@ const HomePage: React.FC = () => {
       {/* Sección de gráficos / viz (placeholder) */}
       <section>
         <h2 className="text-sm font-semibold text-slate-700 mb-3">
-          Visualizaciones (prototipo)
+          Stock por categoría
         </h2>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {/* Gráfico 1 */}
-          <div className="bg-white border border-slate-200 rounded-lg shadow-sm p-4">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold text-slate-700">
-                Stock por categoría
-              </h3>
-              <span className="text-xs text-slate-400">Mock</span>
-            </div>
-            <div className="h-40 flex items-center justify-center text-xs text-slate-400 border border-dashed border-slate-200 rounded-md">
-              Aquí se mostrará un gráfico de barras con el stock agrupado por categoría.
-            </div>
-          </div>
-
-          {/* Gráfico 2 */}
-          <div className="bg-white border border-slate-200 rounded-lg shadow-sm p-4">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold text-slate-700">
-                Movimientos últimos 7 días
-              </h3>
-              <span className="text-xs text-slate-400">Mock</span>
-            </div>
-            <div className="h-40 flex items-center justify-center text-xs text-slate-400 border border-dashed border-slate-200 rounded-md">
-              Aquí se mostrará un gráfico de líneas con entradas y salidas diarias.
-            </div>
+        <div className="bg-white border border-slate-200 rounded-lg shadow-sm p-4">
+          <div className="space-y-2">
+            {stats.cantidadPorCategoria.length > 0 ? (
+              stats.cantidadPorCategoria.map((cat, idx) => (
+                <div key={idx} className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-slate-700">{cat.nombre}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-32 bg-slate-100 rounded-full h-2">
+                      <div
+                        className="bg-blue-500 h-2 rounded-full"
+                        style={{
+                          width: `${Math.min((cat.cantidad / Math.max(...stats.cantidadPorCategoria.map(c => c.cantidad))) * 100, 100)}%`,
+                        }}
+                      />
+                    </div>
+                    <span className="text-sm font-semibold text-slate-700 w-8 text-right">
+                      {cat.cantidad}
+                    </span>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="text-xs text-slate-400">No hay datos de categorías.</p>
+            )}
           </div>
         </div>
       </section>
@@ -102,7 +168,7 @@ const HomePage: React.FC = () => {
       {/* Sección de alertas y actividad reciente */}
       <section>
         <h2 className="text-sm font-semibold text-slate-700 mb-3">
-          Alertas y actividad reciente
+          Alertas y proveedores
         </h2>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -113,119 +179,73 @@ const HomePage: React.FC = () => {
             </h3>
 
             <ul className="space-y-2 text-sm">
-              <li className="flex items-start gap-2">
-                <span className="mt-1 h-2 w-2 rounded-full bg-amber-500" />
-                <div>
-                  <p className="text-slate-700">
-                    7 productos con stock por debajo del mínimo.
-                  </p>
-                  <p className="text-xs text-slate-400">
-                    Revisar reporte de Stock Bajo en la sección Reportes.
-                  </p>
-                </div>
-              </li>
+              {stats.productosStockBajo > 0 && (
+                <li className="flex items-start gap-2">
+                  <span className="mt-1 h-2 w-2 rounded-full bg-amber-500" />
+                  <div>
+                    <p className="text-slate-700">
+                      {stats.productosStockBajo} {stats.productosStockBajo === 1 ? "producto" : "productos"} con stock por debajo del mínimo.
+                    </p>
+                    <p className="text-xs text-slate-400">
+                      Revisar reporte de Stock Bajo en el módulo de Movimientos.
+                    </p>
+                  </div>
+                </li>
+              )}
 
-              <li className="flex items-start gap-2">
-                <span className="mt-1 h-2 w-2 rounded-full bg-red-500" />
-                <div>
-                  <p className="text-slate-700">
-                    2 productos sin proveedor asignado.
-                  </p>
-                  <p className="text-xs text-slate-400">
-                    Verificar datos en el módulo de Productos / Proveedores.
-                  </p>
-                </div>
-              </li>
+              {stats.valorizacionStock && stats.valorizacionStock > 0 && (
+                <li className="flex items-start gap-2">
+                  <span className="mt-1 h-2 w-2 rounded-full bg-blue-500" />
+                  <div>
+                    <p className="text-slate-700">
+                      Valorización del inventario: ${stats.valorizacionStock.toFixed(2)}
+                    </p>
+                    <p className="text-xs text-slate-400">
+                      Valor total en stock disponible.
+                    </p>
+                  </div>
+                </li>
+              )}
 
-              <li className="flex items-start gap-2">
-                <span className="mt-1 h-2 w-2 rounded-full bg-emerald-500" />
-                <div>
-                  <p className="text-slate-700">
-                    Última sincronización de inventario hace 3 horas.
-                  </p>
-                  <p className="text-xs text-slate-400">
-                    Todo funcionando dentro de los parámetros esperados.
-                  </p>
-                </div>
-              </li>
+              {stats.productosStockBajo === 0 && (
+                <li className="flex items-start gap-2">
+                  <span className="mt-1 h-2 w-2 rounded-full bg-emerald-500" />
+                  <div>
+                    <p className="text-slate-700">
+                      Todos los productos tienen stock adecuado.
+                    </p>
+                    <p className="text-xs text-slate-400">
+                      Sistema funcionando dentro de los parámetros esperados.
+                    </p>
+                  </div>
+                </li>
+              )}
             </ul>
           </div>
 
-          {/* Actividad reciente */}
+          {/* Proveedores */}
           <div className="bg-white border border-slate-200 rounded-lg shadow-sm p-4">
             <h3 className="text-sm font-semibold text-slate-700 mb-2">
-              Últimos movimientos (mock)
+              Distribución por proveedor
             </h3>
 
-            <div className="border border-slate-200 rounded-md overflow-hidden">
-              <table className="min-w-full text-sm">
-                <thead className="bg-slate-50 border-b border-slate-200">
-                  <tr>
-                    <th className="px-3 py-2 text-left text-xs font-semibold text-slate-500">
-                      Fecha
-                    </th>
-                    <th className="px-3 py-2 text-left text-xs font-semibold text-slate-500">
-                      Tipo
-                    </th>
-                    <th className="px-3 py-2 text-left text-xs font-semibold text-slate-500">
-                      Producto
-                    </th>
-                    <th className="px-3 py-2 text-right text-xs font-semibold text-slate-500">
-                      Cantidad
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className="border-b border-slate-100">
-                    <td className="px-3 py-2 text-xs text-slate-600">
-                      25/11/2025 10:32
-                    </td>
-                    <td className="px-3 py-2 text-xs text-emerald-600">
-                      Entrada
-                    </td>
-                    <td className="px-3 py-2 text-xs text-slate-700">
-                      Mate Imperial Negro
-                    </td>
-                    <td className="px-3 py-2 text-xs text-right text-emerald-600">
-                      +15
-                    </td>
-                  </tr>
-                  <tr className="border-b border-slate-100">
-                    <td className="px-3 py-2 text-xs text-slate-600">
-                      25/11/2025 09:10
-                    </td>
-                    <td className="px-3 py-2 text-xs text-red-600">
-                      Salida
-                    </td>
-                    <td className="px-3 py-2 text-xs text-slate-700">
-                      Vaso térmico acero
-                    </td>
-                    <td className="px-3 py-2 text-xs text-right text-red-600">
-                      -4
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="px-3 py-2 text-xs text-slate-600">
-                      24/11/2025 18:45
-                    </td>
-                    <td className="px-3 py-2 text-xs text-emerald-600">
-                      Entrada
-                    </td>
-                    <td className="px-3 py-2 text-xs text-slate-700">
-                      Set velas decorativas
-                    </td>
-                    <td className="px-3 py-2 text-xs text-right text-emerald-600">
-                      +30
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <p className="mt-2 text-xs text-slate-400">
-              Esta tabla es solo ilustrativa para el prototipo. Luego se
-              conectará al módulo real de Movimientos.
-            </p>
+            {stats.cantidadPorProveedor.length > 0 ? (
+              <div className="space-y-2">
+                {stats.cantidadPorProveedor.slice(0, 5).map((prov, idx) => (
+                  <div key={idx} className="flex items-center justify-between text-sm">
+                    <span className="text-slate-700">{prov.nombre}</span>
+                    <span className="font-semibold text-slate-800">{prov.cantidad}</span>
+                  </div>
+                ))}
+                {stats.cantidadPorProveedor.length > 5 && (
+                  <p className="text-xs text-slate-400 mt-2">
+                    +{stats.cantidadPorProveedor.length - 5} más
+                  </p>
+                )}
+              </div>
+            ) : (
+              <p className="text-xs text-slate-400">No hay datos de proveedores.</p>
+            )}
           </div>
         </div>
       </section>
@@ -234,41 +254,3 @@ const HomePage: React.FC = () => {
 };
 
 export default HomePage;
-
-
-/*
-import React from "react";
-
-const HomePage: React.FC = () => {
-  return (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-semibold text-slate-800">
-        Dashboard general
-      </h1>
-      <p className="text-slate-500 text-sm">
-        Esta es la vista principal del prototipo. Acá después vas a mostrar
-        tarjetas de stock, alertas y resúmenes.
-      </p>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white shadow-sm rounded-lg p-4 border border-slate-100">
-          <div className="text-xs text-slate-400">Productos totales</div>
-          <div className="text-2xl font-bold text-slate-800 mt-1">124</div>
-        </div>
-
-        <div className="bg-white shadow-sm rounded-lg p-4 border border-slate-100">
-          <div className="text-xs text-slate-400">Stock bajo</div>
-          <div className="text-2xl font-bold text-amber-600 mt-1">7</div>
-        </div>
-
-        <div className="bg-white shadow-sm rounded-lg p-4 border border-slate-100">
-          <div className="text-xs text-slate-400">Movimientos hoy</div>
-          <div className="text-2xl font-bold text-emerald-600 mt-1">23</div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default HomePage;
-*/
