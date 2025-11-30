@@ -1,3 +1,4 @@
+// frontend/src/components/productos/ProductoForm.tsx
 import React from "react";
 import type { Producto } from "../../mocks/productosMock";
 
@@ -7,7 +8,11 @@ type ProductoFormProps = {
   productoInicial?: Producto;
 };
 
-const ProductoForm: React.FC<ProductoFormProps> = ({ modo, onCancelar, productoInicial }) => {
+const ProductoForm: React.FC<ProductoFormProps> = ({
+  modo,
+  onCancelar,
+  productoInicial,
+}) => {
   const esEdicion = modo === "editar";
 
   return (
@@ -44,13 +49,15 @@ const ProductoForm: React.FC<ProductoFormProps> = ({ modo, onCancelar, productoI
           <label className="block text-xs font-medium text-slate-500 mb-1">
             Categoría
           </label>
-          <select className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400">
+          <select
+            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400"
+            defaultValue={productoInicial?.categoria ?? ""}
+          >
             <option value="">Seleccionar...</option>
             <option value="Regalería">Regalería</option>
             <option value="Bazar">Bazar</option>
             <option value="Decoración">Decoración</option>
           </select>
-          defaultValue={productoInicial?.categoria ?? ""}
         </div>
 
         {/* Proveedor */}
@@ -58,13 +65,15 @@ const ProductoForm: React.FC<ProductoFormProps> = ({ modo, onCancelar, productoI
           <label className="block text-xs font-medium text-slate-500 mb-1">
             Proveedor
           </label>
-          <select className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400">
+          <select
+            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400"
+            defaultValue={productoInicial?.proveedor ?? ""}
+          >
             <option value="">Seleccionar...</option>
             <option value="Proveedor Andes">Proveedor Andes</option>
             <option value="AceroPlus">AceroPlus</option>
             <option value="Luz &amp; Aroma">Luz &amp; Aroma</option>
           </select>
-          defaultValue={productoInicial?.proveedor ?? ""}
         </div>
 
         {/* Stock mínimo */}
@@ -98,8 +107,10 @@ const ProductoForm: React.FC<ProductoFormProps> = ({ modo, onCancelar, productoI
           <label className="block text-xs font-medium text-slate-500 mb-1">
             Estado
           </label>
-          defaultValue={productoInicial?.estado ?? "Activo"}
-          <select className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400">
+          <select
+            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400"
+            defaultValue={productoInicial?.estado ?? "Activo"}
+          >
             <option value="Activo">Activo</option>
             <option value="Inactivo">Inactivo</option>
           </select>
@@ -115,15 +126,15 @@ const ProductoForm: React.FC<ProductoFormProps> = ({ modo, onCancelar, productoI
           rows={3}
           className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400"
           placeholder="Descripción breve del producto, materiales, uso, etc."
+          defaultValue={productoInicial?.descripcion ?? ""}
         />
-        defaultValue={productoInicial?.descripcion ?? ""}
       </div>
 
       {/* Info prototipo */}
       <p className="text-xs text-slate-400">
-        Este formulario forma parte del prototipo: los campos no están
-        conectados al backend ni a la base de datos. En la versión final se
-        validarán y persistirán los cambios.
+        Este formulario forma parte del prototipo: los campos no están conectados
+        al backend ni a la base de datos. En la versión final se validarán y
+        persistirán los cambios.
       </p>
 
       {/* Botones */}

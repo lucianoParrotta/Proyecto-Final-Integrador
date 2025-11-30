@@ -13,6 +13,8 @@ import PrivateRoute from "./components/PrivateRoute";
 import CategoriasPages from "./pages/CategoriasPages";
 import ProveedoresPage from "./pages/ProveedoresPage";
 
+// ⬇️ NUEVO IMPORT
+import ProveedorCreatePage from "./pages/ProveedorCreatePage";
 
 const App: React.FC = () => {
   return (
@@ -31,15 +33,25 @@ const App: React.FC = () => {
       >
         <Route path="home" element={<HomePage />} />
         <Route index element={<HomePage />} />
+
+        {/* Productos */}
         <Route path="productos" element={<ProductosListPage />} />
         <Route path="productos/nuevo" element={<ProductoCreatePage />} />
         <Route path="productos/:id" element={<ProductoDetailPage />} />
         <Route path="productos/:id/editar" element={<ProductoEditPage />} />
-        <Route path="movimientos" element={<MovimientosListPage />} />
-        <Route path="perfil" element={<ProfilePage />} />
-        <Route path="categorias" element={<CategoriasPages />} />
-        <Route path="proveedores" element={<ProveedoresPage />} />
 
+        {/* Movimientos */}
+        <Route path="movimientos" element={<MovimientosListPage />} />
+
+        {/* Perfil */}
+        <Route path="perfil" element={<ProfilePage />} />
+
+        {/* Categorías */}
+        <Route path="categorias" element={<CategoriasPages />} />
+
+        {/* Proveedores */}
+        <Route path="proveedores" element={<ProveedoresPage />} />
+        <Route path="proveedores/nuevo" element={<ProveedorCreatePage />} />
       </Route>
     </Routes>
   );

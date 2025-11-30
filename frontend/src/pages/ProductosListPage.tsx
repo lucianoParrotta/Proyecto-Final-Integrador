@@ -411,7 +411,10 @@ const ProductosListPage: React.FC = () => {
                         >
                           Editar
                         </Link>
-                        <button className="px-2 py-1 rounded-md border border-slate-200 text-slate-400 cursor-not-allowed">
+                        <button
+                          onClick={() => alert("Eliminar (mock)")}
+                          className="px-2 py-1 rounded-md border border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 transition"
+                        >
                           Eliminar
                         </button>
                       </div>
