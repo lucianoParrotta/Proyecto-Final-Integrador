@@ -1,5 +1,3 @@
-// frontend/src/mocks/productosMock.ts
-
 export type Producto = {
   id: number;
   codigo: string;

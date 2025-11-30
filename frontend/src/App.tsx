@@ -11,8 +11,8 @@ import ProductoDetailPage from "./pages/ProductoDetailPage";
 import MovimientosListPage from "./pages/MovimientosListPage";
 import PrivateRoute from "./components/PrivateRoute";
 import CategoriasPages from "./pages/CategoriasPages";
-import ProveedoresPage from "./pages/proveedores/ProveedoresPage";
-import ProveedorDetallePage from "./pages/proveedores/ProveedorDetallePage";
+import ProveedoresPage from "./pages/ProveedoresPage";
+
 
 const App: React.FC = () => {
   return (
@@ -39,7 +39,6 @@ const App: React.FC = () => {
         <Route path="perfil" element={<ProfilePage />} />
         <Route path="categorias" element={<CategoriasPages />} />
         <Route path="proveedores" element={<ProveedoresPage />} />
-        <Route path="proveedores/:id" element={<ProveedorDetallePage />} />
 
       </Route>
     </Routes>
