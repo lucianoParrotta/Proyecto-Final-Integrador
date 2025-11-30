@@ -32,7 +32,11 @@ export default function ProveedorList({ proveedores, onDelete }: Props) {
 
           <div className="flex justify-center">
             <button
-              onClick={() => onDelete(p.id)}
+              onClick={() => {
+                if (window.confirm("¿Seguro que querés eliminar este proveedor?")) {
+                  onDelete(p.id);
+                }
+              }}
               className="px-3 py-1 bg-red-500 text-white rounded"
             >
               Eliminar
