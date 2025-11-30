@@ -242,7 +242,9 @@ const rotacionPorProducto = async (req, res) => {
   try {
     const { productoId, fechaInicio, fechaFin } = req.query;
 
-    const where = { productoId };
+    const where = {};
+    if (productoId) where.productoId = productoId;
+    
     if (fechaInicio || fechaFin) {
       where.fecha = {};
       if (fechaInicio) where.fecha[Op.gte] = new Date(fechaInicio);
@@ -254,18 +256,41 @@ const rotacionPorProducto = async (req, res) => {
       order: [["fecha", "DESC"]],
     });
 
-    let totalSalidas = 0;
+    // Agrupar por producto
+    const rotacionMap = new Map();
+
     movimientos.forEach((mov) => {
-      if (mov.tipo === "SALIDA") {
-        totalSalidas += parseFloat(mov.cantidad);
+      const pId = mov.productoId;
+      if (!rotacionMap.has(pId)) {
+        rotacionMap.set(pId, {
+          productoId: pId,
+          totalEntradas: 0,
+          totalSalidas: 0,
+          movimientos: [],
+        });
       }
+
+      const data = rotacionMap.get(pId);
+      if (mov.tipo === "ENTRADA") {
+        data.totalEntradas += parseFloat(mov.cantidad);
+      } else {
+        data.totalSalidas += parseFloat(mov.cantidad);
+      }
+      data.movimientos.push(mov);
     });
 
-    res.json({
-      productoId,
-      totalSalidas,
-      movimientos,
-    });
+    // Calcular rotación para cada producto
+    const resultado = Array.from(rotacionMap.values()).map((item) => ({
+      productoId: item.productoId,
+      totalEntradas: parseFloat(item.totalEntradas.toFixed(2)),
+      totalSalidas: parseFloat(item.totalSalidas.toFixed(2)),
+      rotacion: item.totalEntradas > 0 
+        ? parseFloat((item.totalSalidas / item.totalEntradas).toFixed(2))
+        : 0,
+      movimientos: item.movimientos,
+    }));
+
+    res.json(resultado);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
