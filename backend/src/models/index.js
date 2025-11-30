@@ -3,13 +3,13 @@ const sequelize = require('../config/database').sequelize;
 
 const CategoriaFactory = require('./Categoria');
 const ProductoFactory = require('./Producto');
+const Proveedor = require('./Proveedor');
 
 const MovimientoStock = require('./MovimientoStock');
 
 // Instanciar modelos
 const Categoria = CategoriaFactory(sequelize, DataTypes);
 const Producto = ProductoFactory(sequelize, DataTypes);
-const Proveedor = require("./Proveedor");
 
 
 // Categoria 1 - N Producto
@@ -33,6 +33,17 @@ MovimientoStock.belongsTo(Producto, {
   foreignKey: 'productoId',
   as: 'producto',
 });
+
+Proveedor.hasMany(Producto, {
+  foreignKey: "proveedorId",
+  as: "productos",
+});
+
+Producto.belongsTo(Proveedor, {
+  foreignKey: "proveedorId",
+  as: "proveedor",
+});
+
 
 // Exportar todo
 module.exports = {
