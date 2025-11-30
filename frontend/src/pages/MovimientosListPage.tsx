@@ -111,25 +111,7 @@ const MovimientosListPage: React.FC = () => {
         return;
       }
 
-      const url = editando
-        ? `${apiUrl}/movimientos/${movimientoSeleccionado?.id}`
-        : `${apiUrl}/movimientos`;
-
-      const method = editando ? "PUT" : "POST";
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": import.meta.env.VITE_API_KEY || "test-key",
-        },
-        body: JSON.stringify(formulario),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Error ${response.status}`);
-      }
-
+      // Simular guardado con mocks
       setMostrarModal(false);
       setFormulario({
         productoId: "",
@@ -166,17 +148,7 @@ const MovimientosListPage: React.FC = () => {
       return;
 
     try {
-      const response = await fetch(`${apiUrl}/movimientos/${id}`, {
-        method: "DELETE",
-        headers: {
-          "x-api-key": import.meta.env.VITE_API_KEY || "test-key",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`Error ${response.status}`);
-      }
-
+      // Simular eliminación con mocks
       cargarMovimientos();
     } catch (err) {
       const errorMessage =
@@ -213,24 +185,19 @@ const MovimientosListPage: React.FC = () => {
 
   const exportarPDF = async () => {
     try {
-      const params = new URLSearchParams();
-      if (filtroFechaInicio) params.append("fechaInicio", filtroFechaInicio);
-      if (filtroFechaFin) params.append("fechaFin", filtroFechaFin);
-
-      const response = await fetch(
-        `${apiUrl}/movimientos/reportes/periodo?${params}`,
-        {
-          headers: {
-            "x-api-key": import.meta.env.VITE_API_KEY || "test-key",
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Error ${response.status}`);
+      // Usar mocks para exportar
+      let datos = getMovimientosMock();
+      
+      if (filtroFechaInicio || filtroFechaFin) {
+        datos = datos.filter((m) => {
+          const fecha = new Date(m.fecha);
+          if (filtroFechaInicio && fecha < new Date(filtroFechaInicio))
+            return false;
+          if (filtroFechaFin && fecha > new Date(filtroFechaFin)) return false;
+          return true;
+        });
       }
 
-      const data = await response.json();
       const csvContent = [
         [
           "ID",
@@ -241,7 +208,7 @@ const MovimientosListPage: React.FC = () => {
           "Descripción",
           "Usuario",
         ],
-        ...data.map((mov: Movimiento) => [
+        ...datos.map((mov: Movimiento) => [
           mov.id,
           mov.productoId,
           mov.tipo,
@@ -270,20 +237,36 @@ const MovimientosListPage: React.FC = () => {
 
   const exportarRotacion = async () => {
     try {
-      const response = await fetch(
-        `${apiUrl}/movimientos/reportes/rotacion`,
-        {
-          headers: {
-            "x-api-key": import.meta.env.VITE_API_KEY || "test-key",
-          },
+      // Calcular rotación desde mocks
+      const datos = getMovimientosMock();
+      
+      const rotacionMap = new Map();
+      datos.forEach((mov) => {
+        const pId = mov.productoId;
+        if (!rotacionMap.has(pId)) {
+          rotacionMap.set(pId, {
+            productoId: pId,
+            totalEntradas: 0,
+            totalSalidas: 0,
+          });
         }
-      );
 
-      if (!response.ok) {
-        throw new Error(`Error ${response.status}`);
-      }
+        const data = rotacionMap.get(pId);
+        if (mov.tipo === "ENTRADA") {
+          data.totalEntradas += mov.cantidad;
+        } else {
+          data.totalSalidas += mov.cantidad;
+        }
+      });
 
-      const data = await response.json();
+      const resultado = Array.from(rotacionMap.values()).map((item) => ({
+        productoId: item.productoId,
+        totalEntradas: item.totalEntradas,
+        totalSalidas: item.totalSalidas,
+        rotacion: item.totalEntradas > 0 
+          ? (item.totalSalidas / item.totalEntradas).toFixed(2)
+          : "0.00",
+      }));
 
       const csvContent = [
         [
@@ -292,13 +275,11 @@ const MovimientosListPage: React.FC = () => {
           "Total Salidas",
           "Rotación (Salidas/Entradas)",
         ],
-        ...data.map((rot: any) => [
+        ...resultado.map((rot: any) => [
           rot.productoId,
           rot.totalEntradas,
           rot.totalSalidas,
-          rot.totalEntradas > 0
-            ? (rot.totalSalidas / rot.totalEntradas).toFixed(2)
-            : "0.00",
+          rot.rotacion,
         ]),
       ];
 
