@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import type { Categoria } from "../../pages/CategoriasPages";
-import "../styles/ModalCategoria.css";
+import "../../styles/ModalCategoria.css";
 
 interface Props {
   show: boolean;
