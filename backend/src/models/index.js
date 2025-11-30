@@ -9,8 +9,8 @@ const MovimientoStock = require('./MovimientoStock');
 // Instanciar modelos
 const Categoria = CategoriaFactory(sequelize, DataTypes);
 const Producto = ProductoFactory(sequelize, DataTypes);
+const Proveedor = require("./Proveedor");
 
-//asociaciones
 
 // Categoria 1 - N Producto
 Categoria.hasMany(Producto, {
@@ -41,4 +41,5 @@ module.exports = {
   Categoria,
   Producto,
   MovimientoStock,
+  Proveedor,
 };

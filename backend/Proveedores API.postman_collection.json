@@ -1,0 +1,161 @@
+{
+	"info": {
+		"_postman_id": "f76e934d-573c-4a92-9d87-dcbcb76e9a3b",
+		"name": "Proveedores API",
+		"description": "Colección para probar CRUD de proveedores",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "45707109",
+		"_collection_link": "https://fran-9508080.postman.co/workspace/Fran's-Workspace~f78e337f-b78c-4e68-8b37-ab2f95f4214f/collection/45707109-f76e934d-573c-4a92-9d87-dcbcb76e9a3b?action=share&source=collection_link&creator=45707109"
+	},
+	"item": [
+		{
+			"name": "GET - Listar Proveedores",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "123456",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/api/proveedores",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"proveedores"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET - Proveedor por ID",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "123456",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/api/proveedores/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"proveedores",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST - Crear Proveedor",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "x-api-key",
+						"value": "123456",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"nombre\": \"Proveedor Ejemplo 2\",\n  \"cuit\": \"30-12345678-50\",\n  \"telefono\": \"15565462\",\n  \"email\": \"proveedor2@gmail.com\",\n  \"direccion\": \"Calle Falsa 782\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/proveedores",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"proveedores"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT - Actualizar Proveedor",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "x-api-key",
+						"value": "123456",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"nombre\": \"Proveedor 2 Modificado\",\n  \"cuit\": \"30-00000000-0\",\n  \"telefono\": \"987654321\",\n  \"email\": \"nuevo@gmail.com\",\n  \"direccion\": \"Nueva Dirección 456\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/proveedores/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"proveedores",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE - Eliminar Proveedor",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "123456",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/api/proveedores/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"proveedores",
+						"2"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

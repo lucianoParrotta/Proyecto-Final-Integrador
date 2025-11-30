@@ -65,3 +65,4 @@ const cambiarPassword = (req, res) => {
 };
 
 module.exports = { login, me, cambiarPassword };
+
