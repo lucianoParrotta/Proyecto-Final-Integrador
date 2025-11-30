@@ -3,10 +3,20 @@ import { Routes, Route } from "react-router-dom";
 import AppLayout from "./layouts/AppLayout";
 import HomePage from "./pages/HomePage";
 import ProductosListPage from "./pages/ProductosListPage";
+<<<<<<< Updated upstream
 
 // IMPORTS DE PROVEEDORES (agregar)
 import ProveedoresPage from "./pages/proveedores/ProveedoresPage";
 import ProveedorDetallePage from "./pages/proveedores/ProveedorDetallePage";
+=======
+import ProductoCreatePage from "./pages/ProductoCreatePage";
+import ProductoEditPage from "./pages/ProductoEditPage";
+import ProductoDetailPage from "./pages/ProductoDetailPage";
+import MovimientosListPage from "./pages/MovimientosListPage";
+import PrivateRoute from "./components/PrivateRoute";
+import CategoriasPages from "./pages/CategoriasPages";
+import ProveedoresPage from "./pages/ProveedoresPage";
+>>>>>>> Stashed changes
 
 const App: React.FC = () => {
   return (
@@ -18,7 +28,6 @@ const App: React.FC = () => {
 
         {/* 📌 RUTAS DEL MÓDULO PROVEEDORES */}
         <Route path="proveedores" element={<ProveedoresPage />} />
-        <Route path="proveedores/:id" element={<ProveedorDetallePage />} />
 
         {/* después sumamos más rutas: categorías, etc. */}
       </Route>

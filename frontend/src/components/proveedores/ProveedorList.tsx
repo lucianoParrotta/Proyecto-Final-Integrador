@@ -1,22 +1,44 @@
 import type { Proveedor } from "../../types/proveedor";
-import ProveedorCard from "./ProveedorCard";
 
 interface Props {
   proveedores: Proveedor[];
-  onSelect: (p: Proveedor) => void;
-  onDelete: (id: string) => void;   // ⬅️ NUEVO
+  onDelete: (id: string) => void;
 }
 
-export default function ProveedorList({ proveedores, onSelect, onDelete }: Props) {
+export default function ProveedorList({ proveedores, onDelete }: Props) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="p-4 bg-white border rounded shadow">
+      {/* Encabezado */}
+      <div className="grid grid-cols-6 font-semibold border-b pb-2">
+        <span>Nombre</span>
+        <span>Teléfono</span>
+        <span>Email</span>
+        <span>CUIT</span>
+        <span>Dirección</span>
+        <span className="text-center">Acciones</span>
+      </div>
+
+      {/* Filas */}
       {proveedores.map((p) => (
-        <ProveedorCard
+        <div
           key={p.id}
-          proveedor={p}
-          onClick={() => onSelect(p)}
-          onDelete={() => onDelete(p.id)}   // ⬅️ NUEVO
-        />
+          className="grid grid-cols-6 py-2 border-b hover:bg-gray-100 items-center"
+        >
+          <span>{p.nombre}</span>
+          <span>{p.telefono}</span>
+          <span>{p.email}</span>
+          <span>{p.cuit}</span>
+          <span>{p.direccion}</span>
+
+          <div className="flex justify-center">
+            <button
+              onClick={() => onDelete(p.id)}
+              className="px-3 py-1 bg-red-500 text-white rounded"
+            >
+              Eliminar
+            </button>
+          </div>
+        </div>
       ))}
     </div>
   );

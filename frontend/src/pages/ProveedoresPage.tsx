@@ -1,13 +1,11 @@
-import type { Proveedor } from "../../types/proveedor";
-import { getProveedoresMock } from "../../api/proveedores";
-import ProveedorList from "../../components/proveedores/ProveedorList";
-import ProveedorForm from "../../components/proveedores/ProveedorForm";
+import type { Proveedor } from "../types/proveedor";
+import { getProveedoresMock } from "../api/proveedores";
+import ProveedorList from "../components/proveedores/ProveedorList";
+import ProveedorForm from "../components/proveedores/ProveedorForm";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 export default function ProveedoresPage() {
   const [proveedores, setProveedores] = useState<Proveedor[]>([]);
-  const navigate = useNavigate();
 
   useEffect(() => {
     setProveedores(getProveedoresMock());
@@ -25,7 +23,6 @@ export default function ProveedoresPage() {
 
       <ProveedorList
         proveedores={proveedores}
-        onSelect={(p) => navigate(`/proveedores/${p.id}`)}
         onDelete={handleDelete}
       />
     </div>

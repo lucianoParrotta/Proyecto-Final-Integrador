@@ -52,10 +52,23 @@ const Sidebar: React.FC = () => {
           to="/proveedores"
           className={({ isActive }) =>
             `${linkBase} ${isActive ? linkActive : linkInactive}`
+<<<<<<< Updated upstream
           }
         >
           Proveedores
         </NavLink>
+=======
+          }>
+            Proveedores
+        </NavLink>
+
+        {/* Próximas funcionalidades (deshabilitadas) */}
+        <div className="mt-3 text-xs font-semibold text-slate-400 uppercase px-2">
+          Próximas funcionalidades
+        </div>
+
+        
+>>>>>>> Stashed changes
 
         <NavLink
           to="/movimientos"
