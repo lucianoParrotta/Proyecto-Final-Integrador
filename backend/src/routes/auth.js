@@ -1,8 +1,17 @@
-const { Router } = require("express");
-const { login } = require("../controllers/authController");
+// src/routes/auth.js
+const express = require("express");
+const router = express.Router();
 
-const router = Router();
+const { login, me, cambiarPassword } = require("../controllers/authController");
+const verifyToken = require("../middlewares/auth");
 
+// Login (solo requiere API Key)
 router.post("/login", login);
+
+// Perfil /me (requiere API Key + JWT)
+router.get("/me", verifyToken, me);
+
+// Cambiar contraseña (requiere API Key + JWT)
+router.post("/cambiar-password", verifyToken, cambiarPassword);
 
 module.exports = router;
