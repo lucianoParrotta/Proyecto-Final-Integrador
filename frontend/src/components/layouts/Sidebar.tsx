@@ -17,13 +17,12 @@ const Sidebar: React.FC = () => {
 
       <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-1">
         <NavLink
-          to="/"
-          end
+          to="/home"
           className={({ isActive }) =>
             `${linkBase} ${isActive ? linkActive : linkInactive}`
           }
         >
-          Dashboard
+          🏠 Dashboard
         </NavLink>
 
         <div className="mt-3 text-xs font-semibold text-slate-400 uppercase px-2">
@@ -36,25 +35,7 @@ const Sidebar: React.FC = () => {
             `${linkBase} ${isActive ? linkActive : linkInactive}`
           }
         >
-          Productos
-        </NavLink>
-
-        <NavLink
-          to="/categorias"
-          className={({ isActive }) =>
-            `${linkBase} ${isActive ? linkActive : linkInactive}`
-          }
-        >
-          Categorías
-        </NavLink>
-
-        <NavLink
-          to="/proveedores"
-          className={({ isActive }) =>
-            `${linkBase} ${isActive ? linkActive : linkInactive}`
-          }
-        >
-          Proveedores
+          📦 Productos
         </NavLink>
 
         <NavLink
@@ -63,21 +44,33 @@ const Sidebar: React.FC = () => {
             `${linkBase} ${isActive ? linkActive : linkInactive}`
           }
         >
-          Movimientos
+          🔄 Movimientos
         </NavLink>
 
         <div className="mt-3 text-xs font-semibold text-slate-400 uppercase px-2">
-          Reportes
+          Próximas funcionalidades
         </div>
 
-        <NavLink
-          to="/reportes"
-          className={({ isActive }) =>
-            `${linkBase} ${isActive ? linkActive : linkInactive}`
-          }
+        <div
+          className={`${linkBase} ${linkInactive} opacity-50 cursor-not-allowed`}
+          title="No disponible aún"
         >
-          Reportes
-        </NavLink>
+          📋 Categorías
+        </div>
+
+        <div
+          className={`${linkBase} ${linkInactive} opacity-50 cursor-not-allowed`}
+          title="No disponible aún"
+        >
+          🏢 Proveedores
+        </div>
+
+        <div
+          className={`${linkBase} ${linkInactive} opacity-50 cursor-not-allowed`}
+          title="No disponible aún"
+        >
+          📊 Reportes
+        </div>
       </nav>
 
       <div className="border-t border-slate-200 p-3 text-xs text-slate-400">

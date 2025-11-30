@@ -37,6 +37,7 @@ MovimientoStock.belongsTo(Producto, {
 // Exportar todo
 module.exports = {
   sequelize,
+  Sequelize: require('sequelize'),
   Categoria,
   Producto,
   MovimientoStock,
