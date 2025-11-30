@@ -51,8 +51,26 @@ const ProfilePage: React.FC = () => {
     }
 
     try {
-      // Simulación de cambio de contraseña
-      // En un caso real, esto iría a un endpoint backend
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+      
+      const response = await fetch(`${apiUrl}/auth/cambiar-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': import.meta.env.VITE_API_KEY || 'test-key',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          passwordActual: '', // En un caso real, pediríamos la contraseña actual
+          passwordNueva: nuevoPassword,
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Error al cambiar contraseña');
+      }
+
       setSuccess('Contraseña cambiada exitosamente');
       setNuevoPassword('');
       setConfirmPassword('');

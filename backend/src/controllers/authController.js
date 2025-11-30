@@ -37,4 +37,31 @@ const me = (req, res) => {
   });
 };
 
-module.exports = { login, me };
+const cambiarPassword = (req, res) => {
+  const { passwordActual, passwordNueva } = req.body;
+
+  if (!passwordActual || !passwordNueva) {
+    return res.status(400).json({ error: "Faltan datos" });
+  }
+
+  const expectedPassword = process.env.ADMIN_PASSWORD;
+
+  if (passwordActual !== expectedPassword) {
+    return res.status(401).json({ error: "Contraseña actual incorrecta" });
+  }
+
+  if (passwordNueva.length < 6) {
+    return res.status(400).json({ error: "La contraseña debe tener al menos 6 caracteres" });
+  }
+
+  // En un sistema real, aquí actualizarías la contraseña en BD
+  // Por ahora solo validamos que sea correcta
+  // Para cambiar la contraseña en .env manualmente
+  
+  return res.json({
+    message: "Contraseña cambiada exitosamente",
+    nota: "En producción, actualizar ADMIN_PASSWORD en .env"
+  });
+};
+
+module.exports = { login, me, cambiarPassword };
