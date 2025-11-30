@@ -10,7 +10,7 @@ interface Movimiento {
   updatedAt: string;
 }
 
-export const MOCK_MOVIMIENTOS: Movimiento[] = [
+let mockData: Movimiento[] = [
   {
     id: 1,
     productoId: 1,
@@ -102,9 +102,44 @@ export const MOCK_MOVIMIENTOS: Movimiento[] = [
 ];
 
 export function getMovimientosMock(): Movimiento[] {
-  return MOCK_MOVIMIENTOS;
+  return mockData;
 }
 
 export function getMovimientoPorIdMock(id: number): Movimiento | undefined {
-  return MOCK_MOVIMIENTOS.find((m) => m.id === id);
+  return mockData.find((m) => m.id === id);
+}
+
+export function updateMovimientoMock(id: number, datos: Partial<Movimiento>): Movimiento | undefined {
+  const index = mockData.findIndex((m) => m.id === id);
+  if (index !== -1) {
+    mockData[index] = {
+      ...mockData[index],
+      ...datos,
+      updatedAt: new Date().toISOString(),
+    };
+    return mockData[index];
+  }
+  return undefined;
+}
+
+export function deleteMovimientoMock(id: number): boolean {
+  const index = mockData.findIndex((m) => m.id === id);
+  if (index !== -1) {
+    mockData.splice(index, 1);
+    return true;
+  }
+  return false;
+}
+
+export function addMovimientoMock(movimiento: Omit<Movimiento, "id" | "createdAt" | "updatedAt">): Movimiento {
+  const nuevoId = Math.max(...mockData.map((m) => m.id), 0) + 1;
+  const ahora = new Date().toISOString();
+  const nuevo: Movimiento = {
+    ...movimiento,
+    id: nuevoId,
+    createdAt: ahora,
+    updatedAt: ahora,
+  };
+  mockData.push(nuevo);
+  return nuevo;
 }

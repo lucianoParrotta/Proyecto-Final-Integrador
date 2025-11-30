@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import React from "react";
-import { getMovimientosMock } from "../mocks/movimientosMock";
+import { getMovimientosMock, updateMovimientoMock, deleteMovimientoMock, addMovimientoMock } from "../mocks/movimientosMock";
 
 interface Movimiento {
   id: number;
@@ -111,7 +111,26 @@ const MovimientosListPage: React.FC = () => {
         return;
       }
 
-      // Simular guardado con mocks
+      if (editando && movimientoSeleccionado) {
+        // Actualizar movimiento
+        updateMovimientoMock(movimientoSeleccionado.id, {
+          productoId: parseInt(formulario.productoId),
+          tipo: formulario.tipo as "ENTRADA" | "SALIDA",
+          cantidad: parseFloat(formulario.cantidad),
+          descripcion: formulario.descripcion,
+          usuario: formulario.usuario,
+        });
+      } else {
+        // Crear nuevo movimiento
+        addMovimientoMock({
+          productoId: parseInt(formulario.productoId),
+          tipo: formulario.tipo as "ENTRADA" | "SALIDA",
+          cantidad: parseFloat(formulario.cantidad),
+          descripcion: formulario.descripcion,
+          usuario: formulario.usuario,
+        });
+      }
+
       setMostrarModal(false);
       setFormulario({
         productoId: "",
@@ -148,7 +167,8 @@ const MovimientosListPage: React.FC = () => {
       return;
 
     try {
-      // Simular eliminación con mocks
+      // Eliminar del mock
+      deleteMovimientoMock(id);
       cargarMovimientos();
     } catch (err) {
       const errorMessage =
