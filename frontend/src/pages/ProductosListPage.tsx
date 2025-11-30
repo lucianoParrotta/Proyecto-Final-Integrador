@@ -1,13 +1,18 @@
+// frontend/src/pages/ProductosListPage.tsx
 import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { MOCK_PRODUCTOS } from "../mocks/productosMock";
-// si llegaras a necesitar el tipo Producto:
 // import type { Producto } from "../mocks/productosMock";
 
 const ProductosListPage: React.FC = () => {
   const [busqueda, setBusqueda] = useState("");
   const [filtroCategoria, setFiltroCategoria] = useState<string>("todos");
   const [filtroEstado, setFiltroEstado] = useState<string>("todos");
+
+  // Modal exportación
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [exportPDF, setExportPDF] = useState(false);
+  const [exportXLS, setExportXLS] = useState(false);
 
   // Opciones derivadas de los datos mock
   const categorias = useMemo(
@@ -39,6 +44,177 @@ const ProductosListPage: React.FC = () => {
     });
   }, [busqueda, filtroCategoria, filtroEstado]);
 
+  // ---------- EXPORTAR XLS (CSV) ----------
+  const handleExportarXLS = () => {
+    if (productosFiltrados.length === 0) {
+      alert("No hay productos para exportar con los filtros actuales.");
+      return;
+    }
+
+    const encabezados = [
+      "ID",
+      "Código",
+      "Nombre",
+      "Categoría",
+      "Proveedor",
+      "Stock",
+      "Stock mínimo",
+      "Precio",
+      "Estado",
+      "Descripción",
+    ];
+
+    const rows = productosFiltrados.map((p) => [
+      p.id,
+      p.codigo,
+      p.nombre,
+      p.categoria,
+      p.proveedor,
+      p.stock,
+      p.stockMinimo,
+      p.precio,
+      p.estado,
+      p.descripcion ?? "",
+    ]);
+
+    const escapeCSV = (value: unknown) => {
+      const str = String(value ?? "");
+      if (/[",\n;]/.test(str)) {
+        return `"${str.replace(/"/g, '""')}"`;
+      }
+      return str;
+    };
+
+    const csvLines = [
+      encabezados.map(escapeCSV).join(";"),
+      ...rows.map((row) => row.map(escapeCSV).join(";")),
+    ];
+
+    const csvContent = csvLines.join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = `productos-mock-${new Date()
+      .toISOString()
+      .slice(0, 10)}.csv`;
+    link.click();
+    window.URL.revokeObjectURL(url);
+  };
+
+  // ---------- EXPORTAR PDF (print -> Guardar como PDF) ----------
+  const handleExportarPDF = () => {
+    if (productosFiltrados.length === 0) {
+      alert("No hay productos para exportar con los filtros actuales.");
+      return;
+    }
+
+    const rowsHtml = productosFiltrados
+      .map(
+        (p) => `
+        <tr>
+          <td>${p.id}</td>
+          <td>${p.codigo}</td>
+          <td>${p.nombre}</td>
+          <td>${p.categoria}</td>
+          <td>${p.proveedor}</td>
+          <td>${p.stock}</td>
+          <td>${p.stockMinimo}</td>
+          <td>$${p.precio.toLocaleString("es-AR")}</td>
+          <td>${p.estado}</td>
+          <td>${p.descripcion ?? ""}</td>
+        </tr>
+      `
+      )
+      .join("");
+
+    const html = `
+      <!DOCTYPE html>
+      <html lang="es">
+        <head>
+          <meta charset="utf-8" />
+          <title>Listado de productos</title>
+          <style>
+            body {
+              font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+              padding: 24px;
+            }
+            h1 {
+              font-size: 20px;
+              margin-bottom: 16px;
+            }
+            table {
+              border-collapse: collapse;
+              width: 100%;
+              font-size: 12px;
+            }
+            th, td {
+              border: 1px solid #e5e7eb;
+              padding: 6px 8px;
+              text-align: left;
+            }
+            th {
+              background-color: #f3f4f6;
+              font-weight: 600;
+            }
+            caption {
+              caption-side: bottom;
+              margin-top: 8px;
+              font-size: 11px;
+              color: #6b7280;
+            }
+          </style>
+        </head>
+        <body>
+          <h1>Listado de productos (mock)</h1>
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Código</th>
+                <th>Nombre</th>
+                <th>Categoría</th>
+                <th>Proveedor</th>
+                <th>Stock</th>
+                <th>Stock mínimo</th>
+                <th>Precio</th>
+                <th>Estado</th>
+                <th>Descripción</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+            </tbody>
+            <caption>Generado el ${new Date().toLocaleString("es-AR")}</caption>
+          </table>
+        </body>
+      </html>
+    `;
+
+    const win = window.open("", "_blank");
+    if (!win) {
+      alert("No se pudo abrir la ventana de impresión. Revisa el bloqueo de pop-ups.");
+      return;
+    }
+
+    win.document.write(html);
+    win.document.close();
+    win.focus();
+    win.print(); // el usuario elige "Guardar como PDF"
+  };
+
+  // Confirmar exportación desde el modal
+  const handleConfirmExport = () => {
+    if (!exportPDF && !exportXLS) {
+      alert("Seleccioná al menos un formato para exportar.");
+      return;
+    }
+    if (exportXLS) handleExportarXLS();
+    if (exportPDF) handleExportarPDF();
+    setShowExportModal(false);
+  };
+
   return (
     <div className="space-y-6">
       {/* Encabezado */}
@@ -52,7 +228,14 @@ const ProductosListPage: React.FC = () => {
         </div>
 
         <div className="flex gap-2">
-          <button className="px-3 py-2 rounded-md border border-slate-300 text-sm text-slate-700 hover:bg-slate-50">
+          <button
+            onClick={() => {
+              setExportPDF(false);
+              setExportXLS(false);
+              setShowExportModal(true);
+            }}
+            className="px-3 py-2 rounded-md border border-slate-300 text-sm text-slate-700 hover:bg-slate-50"
+          >
             Exportar listado (Mock)
           </button>
           <Link
@@ -267,6 +450,61 @@ const ProductosListPage: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* MODAL EXPORTACIÓN */}
+      {showExportModal && (
+        <div className="fixed inset-0 bg-slate-900/40 flex items-center justify-center z-50 px-4">
+          <div className="bg-white rounded-xl shadow-lg w-full max-w-md">
+            <div className="px-6 pt-6 pb-4 border-b border-slate-100">
+              <h2 className="text-lg font-semibold text-slate-900">
+                Exportar productos
+              </h2>
+              <p className="text-xs text-slate-500 mt-1">
+                Seleccioná uno o más formatos para generar el informe (mock).
+              </p>
+            </div>
+
+            <div className="px-6 py-4 space-y-3">
+              <label className="flex items-center gap-2 text-sm text-slate-700">
+                <input
+                  type="checkbox"
+                  className="rounded border-slate-300"
+                  checked={exportPDF}
+                  onChange={(e) => setExportPDF(e.target.checked)}
+                />
+                PDF
+              </label>
+
+              <label className="flex items-center gap-2 text-sm text-slate-700">
+                <input
+                  type="checkbox"
+                  className="rounded border-slate-300"
+                  checked={exportXLS}
+                  onChange={(e) => setExportXLS(e.target.checked)}
+                />
+                XLS
+              </label>
+            </div>
+
+            <div className="px-6 py-4 border-t border-slate-100 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setShowExportModal(false)}
+                className="px-4 py-2 rounded-md border border-slate-200 text-sm text-slate-700 bg-slate-50 hover:bg-slate-100"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmExport}
+                className="px-4 py-2 rounded-md bg-slate-900 text-sm text-white hover:bg-slate-800"
+              >
+                Exportar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
