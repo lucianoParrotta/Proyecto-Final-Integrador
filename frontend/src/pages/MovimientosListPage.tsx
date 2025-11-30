@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import React from 'react';
+import { getMovimientosMock } from '../mocks/movimientosMock';
 
 interface Movimiento {
   id: number;
@@ -62,31 +63,35 @@ const MovimientosListPage: React.FC = () => {
     setError(null);
 
     try {
-      const params = new URLSearchParams({
-        page: page.toString(),
-        limit: limit.toString(),
-      });
+      // Usar mocks en lugar de API
+      let datos = getMovimientosMock();
 
-      if (filtroTipo) params.append('tipo', filtroTipo);
-      if (filtroProducto) params.append('productoId', filtroProducto);
-      if (filtroFechaInicio) params.append('fechaInicio', filtroFechaInicio);
-      if (filtroFechaFin) params.append('fechaFin', filtroFechaFin);
-
-      const response = await fetch(`${apiUrl}/movimientos?${params}`, {
-        headers: {
-          'x-api-key': import.meta.env.VITE_API_KEY || 'test-key',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`Error ${response.status}`);
+      // Aplicar filtros
+      if (filtroTipo) {
+        datos = datos.filter((m) => m.tipo === filtroTipo);
+      }
+      if (filtroProducto) {
+        datos = datos.filter((m) => m.productoId === parseInt(filtroProducto));
+      }
+      if (filtroFechaInicio || filtroFechaFin) {
+        datos = datos.filter((m) => {
+          const fecha = new Date(m.fecha);
+          if (filtroFechaInicio && fecha < new Date(filtroFechaInicio))
+            return false;
+          if (filtroFechaFin && fecha > new Date(filtroFechaFin)) return false;
+          return true;
+        });
       }
 
-      const data: ApiResponse = await response.json();
-      setMovimientos(data.data);
-      setTotalPages(data.pages);
-      setTotalMovimientos(data.total);
-      setPage(data.page);
+      // Simular paginación
+      const total = datos.length;
+      const pages = Math.ceil(total / limit);
+      const offset = (page - 1) * limit;
+      const paginados = datos.slice(offset, offset + limit);
+
+      setMovimientos(paginados);
+      setTotalPages(pages);
+      setTotalMovimientos(total);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
       setError(errorMessage);
