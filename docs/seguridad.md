@@ -38,8 +38,8 @@ Todas las rutas bajo /api/* pasan por este middleware.
 
 El proyecto utiliza un flujo de login con usuario y contraseña, definido en .env:
 ```ini
-AUTH_USER=admin
-AUTH_PASS=admin123
+ADMIN_USER=admin
+ADMIN_PASSWORD=admin123
 JWT_SECRET=jwt_super_secreto
 ```
 **Endpoint de Login:**
@@ -50,7 +50,7 @@ POST /api/auth/login
 **Body de ejemplo:**
 ```json
 {
-  "username": "admin",
+  "user": "admin",
   "password": "admin123"
 }
 ```
@@ -95,8 +95,6 @@ Seguridad_Global.postman_collection.json
 
 Login
 
-Categorías (GET, POST, PUT, DELETE)
-
 Rutas protegidas con:
 
 API KEY
@@ -116,8 +114,6 @@ El archivo permite probar toda la API sin configuración adicional.
 El cliente envía API KEY → habilita acceso a la API.
 
 El usuario hace login → recibe un JWT.
-
-Todas las operaciones CRUD requieren el token.
 
 **Ejemplo de headers necesarios:**
 

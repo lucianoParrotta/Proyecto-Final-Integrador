@@ -5,6 +5,18 @@
     "description": "Endpoints de estadísticas del sistema",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
+
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "api_key",
+      "value": "clave_de_stats_123"
+    }
+  ],
+
   "item": [
     {
       "name": "GET /api/stats/dashboard",
@@ -13,7 +25,7 @@
         "header": [
           {
             "key": "x-api-key",
-            "value": "{{API_KEY_STATS}}",
+            "value": "{{api_key}}",
             "type": "text"
           }
         ],
