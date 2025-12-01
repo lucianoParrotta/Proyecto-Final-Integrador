@@ -53,7 +53,6 @@ module.exports = (sequelize, DataTypes) => {
       },
     },
     {
-      // 👇 CLAVE: que coincida con lo que Sequelize está esperando para la FK
       tableName: 'Productos', // con P mayúscula
       timestamps: true,
     }
