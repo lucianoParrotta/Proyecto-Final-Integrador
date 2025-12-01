@@ -123,9 +123,10 @@ const MovimientosListPage: React.FC = () => {
       } else {
         // Crear nuevo movimiento
         addMovimientoMock({
-          productoId: parseInt(formulario.productoId),
+          productoId: parseInt(formulario.productoId, 10),
           tipo: formulario.tipo as "ENTRADA" | "SALIDA",
           cantidad: parseFloat(formulario.cantidad),
+          fecha: new Date().toISOString(),          // 👈 ESTA ES LA CLAVE
           descripcion: formulario.descripcion,
           usuario: formulario.usuario,
         });
