@@ -20,6 +20,7 @@ app.use(apiKeyMiddleware);
 
 // Rutas
 app.use("/api/auth", authRoutes);
+app.use("/api", require("./routes"));
 
 app.use("/api/stats", statsRoutes);
 app.use("/api/movimientos", movimientosRoutes);
