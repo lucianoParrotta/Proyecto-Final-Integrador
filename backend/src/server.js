@@ -1,4 +1,9 @@
-require("dotenv").config({ path: require("path").join(__dirname, "..", ".env") });
+// server.js (o el entrypoint que ejecutás en producción)
+
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config(); // carga .env local SOLO en dev
+}
+
 const app = require("./app");
 const { sequelize } = require("./config/database");
 
@@ -6,11 +11,11 @@ const PORT = process.env.PORT || 3000;
 
 async function start() {
   try {
-    // Probar conexión a la base
     await sequelize.authenticate();
     console.log("✅ Conexión a la BD OK");
 
-    await sequelize.sync({ alter: true });
+    // En dev: permite ajustes automáticos. En prod: NO alter.
+    await sequelize.sync({ alter: process.env.NODE_ENV !== "production" });
     console.log("🔧 Tablas sincronizadas");
 
     app.listen(PORT, () => {
