@@ -34,20 +34,26 @@ router.get("/dashboard", apiKeyMiddleware, async (req, res) => {
     // CANTIDAD POR CATEGORÍA
     let cantidadPorCategoria = [];
     try {
-      cantidadPorCategoria = await db.Categoria.findAll({
+      const rows = await db.Producto.findAll({
         attributes: [
-          "nombre",
-          [db.Sequelize.fn("COUNT", db.Sequelize.col("Productos.id")), "cantidad"]
+          "categoriaId",
+          [db.Sequelize.fn("COUNT", db.Sequelize.col("Producto.id")), "cantidad"],
         ],
-        include: [{ 
-          model: db.Producto, 
-          attributes: [],
-          required: false 
-        }],
-        group: ["Categoria.id"],
-        subQuery: false,
-        raw: true
+        include: [
+          {
+            model: db.Categoria,
+            as: "categoria",
+            attributes: ["nombre"],
+          },
+        ],
+        group: ["Producto.categoriaId", "categoria.id"],
+        raw: true,
       });
+
+      cantidadPorCategoria = rows.map(r => ({
+        nombre: r["categoria.nombre"],
+        cantidad: Number(r.cantidad),
+      }));
     } catch (err) {
       console.warn("Advertencia en categorías:", err.message);
       cantidadPorCategoria = [];
@@ -55,7 +61,31 @@ router.get("/dashboard", apiKeyMiddleware, async (req, res) => {
 
     // CANTIDAD POR PROVEEDOR
     let cantidadPorProveedor = [];
-    // (Proveedor no está implementado aún, así que retorna vacío)
+    try {
+      const rows = await db.Producto.findAll({
+        attributes: [
+          "proveedorId",
+          [db.Sequelize.fn("COUNT", db.Sequelize.col("Producto.id")), "cantidad"],
+        ],
+        include: [
+          {
+            model: db.Proveedor,
+            as: "proveedor",
+            attributes: ["nombre"],
+          },
+        ],
+        group: ["Producto.proveedorId", "proveedor.id"],
+        raw: true,
+      });
+
+      cantidadPorProveedor = rows.map(r => ({
+        nombre: r["proveedor.nombre"],
+        cantidad: Number(r.cantidad),
+      }));
+    } catch (err) {
+      console.warn("Advertencia en proveedores:", err.message);
+      cantidadPorProveedor = [];
+    }
 
     // ROTACIÓN 
     let rotacion = [];

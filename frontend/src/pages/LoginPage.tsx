@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import api from "../api/apiClient";
 
 const LoginPage: React.FC = () => {
   const [usuario, setUsuario] = useState('');
@@ -10,8 +11,6 @@ const LoginPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const { login, isAuthenticated } = useAuth();
-
-  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
   useEffect(() => {
     // Verificar si ya hay sesión activa
@@ -32,20 +31,10 @@ const LoginPage: React.FC = () => {
         return;
       }
 
-      const response = await fetch(`${apiUrl}/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': import.meta.env.VITE_API_KEY || 'test-key',
-        },
-        body: JSON.stringify({ user: usuario, password }),
+      const { data } = await api.post("/auth/login", {
+        user: usuario,
+        password,
       });
-
-      if (!response.ok) {
-        throw new Error('Credenciales inválidas');
-      }
-
-      const data = await response.json();
 
       // Usar el contexto de autenticación
       login(usuario, data.token);
