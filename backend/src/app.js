@@ -57,7 +57,19 @@ app.use(cors(corsOptions));
 
 app.use(express.json());
 
-// API KEY obligatoria para todas las rutas
+/* =========================
+   HEALTH CHECK (PÚBLICO)
+   - No requiere API KEY
+========================= */
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
+/* =========================
+   API KEY (PROTEGE TODO LO DEMÁS)
+========================= */
+
+// API KEY obligatoria para todas las rutas /api
 app.use(apiKeyMiddleware);
 
 /* =========================

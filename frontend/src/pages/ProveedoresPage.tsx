@@ -2,7 +2,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import type { Proveedor } from "../types/proveedor";
-import { getProveedoresMock } from "../api/proveedores";
+import { getProveedoresMock } from "../api/proveedoresMock";
 import ProveedorList from "../components/proveedores/ProveedorList";
 
 const ProveedoresPage: React.FC = () => {

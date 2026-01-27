@@ -5,7 +5,7 @@ import { MOCK_PRODUCTOS } from "../mocks/productosMock";
 import ModalCategoria from "../components/categorias/ModalCategoria";
 import ModalExportar from "../components/categorias/ExportModal";
 
-import { exportCategoriasPDF, exportCategoriasXLS } from "../utils/exports";
+import { exportCategoriasPDF, exportCategoriasXLS } from "../utils/exports.js";
 
 export interface Categoria {
   id: number;

@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import api from "../api/apiClient";
+
 
 interface StatsData {
   totalProductos: number;
@@ -27,23 +29,10 @@ const HomePage: React.FC = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/stats/dashboard`,
-          {
-            headers: {
-              "x-api-key": import.meta.env.VITE_API_KEY,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Error al cargar estadísticas");
-        }
-
-        const data = await response.json();
-        setStats(data);
+        const res = await api.get("/stats/dashboard");
+        setStats(res.data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Error desconocido");
+        setError("Error al cargar estadísticas");
       } finally {
         setLoading(false);
       }
