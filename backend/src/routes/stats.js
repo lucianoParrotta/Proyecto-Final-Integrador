@@ -36,22 +36,23 @@ router.get("/dashboard", apiKeyMiddleware, async (req, res) => {
     try {
       const rows = await db.Producto.findAll({
         attributes: [
-          "categoriaId",
+          [db.Sequelize.col("categoria.nombre"), "nombre"],
           [db.Sequelize.fn("COUNT", db.Sequelize.col("Producto.id")), "cantidad"],
         ],
         include: [
           {
             model: db.Categoria,
             as: "categoria",
-            attributes: ["nombre"],
+            attributes: [],
+            required: true,
           },
         ],
-        group: ["Producto.categoriaId", "categoria.id"],
+        group: ["categoria.id"],
         raw: true,
       });
 
-      cantidadPorCategoria = rows.map(r => ({
-        nombre: r["categoria.nombre"],
+      cantidadPorCategoria = rows.map((r) => ({
+        nombre: r.nombre,
         cantidad: Number(r.cantidad),
       }));
     } catch (err) {
@@ -64,22 +65,23 @@ router.get("/dashboard", apiKeyMiddleware, async (req, res) => {
     try {
       const rows = await db.Producto.findAll({
         attributes: [
-          "proveedorId",
+          [db.Sequelize.col("proveedor.nombre"), "nombre"],
           [db.Sequelize.fn("COUNT", db.Sequelize.col("Producto.id")), "cantidad"],
         ],
         include: [
           {
             model: db.Proveedor,
             as: "proveedor",
-            attributes: ["nombre"],
+            attributes: [],
+            required: true,
           },
         ],
-        group: ["Producto.proveedorId", "proveedor.id"],
+        group: ["proveedor.id"],
         raw: true,
       });
 
-      cantidadPorProveedor = rows.map(r => ({
-        nombre: r["proveedor.nombre"],
+      cantidadPorProveedor = rows.map((r) => ({
+        nombre: r.nombre,
         cantidad: Number(r.cantidad),
       }));
     } catch (err) {
@@ -96,7 +98,7 @@ router.get("/dashboard", apiKeyMiddleware, async (req, res) => {
             "productoId",
             [db.Sequelize.fn("SUM", db.Sequelize.col("cantidad")), "total"]
           ],
-          where: { tipoMovimiento: "SALIDA" },
+          where: { tipo: "SALIDA" },
           group: ["productoId"],
           raw: true
         });
