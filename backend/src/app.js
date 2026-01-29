@@ -52,7 +52,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // Responder preflight requests ANTES del apiKey
-app.options("*", cors(corsOptions));
+app.options("/*", cors(corsOptions));
 
 /* =========================
    MIDDLEWARES GENERALES
