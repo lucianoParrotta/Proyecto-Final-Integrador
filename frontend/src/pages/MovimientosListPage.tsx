@@ -14,14 +14,6 @@ interface Movimiento {
   updatedAt: string;
 }
 
-interface ApiResponse {
-  total: number;
-  page: number;
-  limit: number;
-  pages: number;
-  data: Movimiento[];
-}
-
 const MovimientosListPage: React.FC = () => {
   const [movimientos, setMovimientos] = useState<Movimiento[]>([]);
   const [loading, setLoading] = useState(false);
@@ -52,8 +44,6 @@ const MovimientosListPage: React.FC = () => {
     descripcion: "",
     usuario: "",
   });
-
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
   useEffect(() => {
     cargarMovimientos();
