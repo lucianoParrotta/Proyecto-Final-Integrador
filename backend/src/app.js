@@ -51,6 +51,9 @@ const corsOptions = {
 // IMPORTANTE: CORS primero
 app.use(cors(corsOptions));
 
+// Responder preflight requests ANTES del apiKey
+app.options("*", cors(corsOptions));
+
 /* =========================
    MIDDLEWARES GENERALES
 ========================= */
