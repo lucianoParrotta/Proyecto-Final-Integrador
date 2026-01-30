@@ -51,8 +51,13 @@ const corsOptions = {
 // IMPORTANTE: CORS primero
 app.use(cors(corsOptions));
 
-// Responder preflight requests ANTES del apiKey
-app.options("/*", cors(corsOptions));
+// Preflight OPTIONS (sin wildcard route: evita crash de Express 5 / path-to-regexp)
+app.use((req, res, next) => {
+  if (req.method === "OPTIONS") {
+    return cors(corsOptions)(req, res, next);
+  }
+  next();
+});
 
 /* =========================
    MIDDLEWARES GENERALES
