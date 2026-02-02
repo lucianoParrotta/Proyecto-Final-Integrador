@@ -5,23 +5,18 @@ import ProductoForm from "../components/productos/ProductoForm";
 const ProductoCreatePage: React.FC = () => {
   const navigate = useNavigate();
 
-  const handleCancelar = () => {
-    navigate("/productos");
-  };
-
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-2xl font-semibold text-slate-800">
-          Nuevo producto
-        </h1>
-        <p className="text-slate-500 text-sm">
-          Alta de productos en el inventario. Esta pantalla es parte del
-          prototipo, los datos todavía no se guardan.
-        </p>
+        <h1 className="text-2xl font-semibold text-slate-800">Nuevo producto</h1>
+        <p className="text-slate-500 text-sm">Alta de productos en el inventario.</p>
       </div>
 
-      <ProductoForm modo="crear" onCancelar={handleCancelar} />
+      <ProductoForm
+        modo="crear"
+        onCancelar={() => navigate("/productos")}
+        onSuccess={() => navigate("/productos")}
+      />
     </div>
   );
 };

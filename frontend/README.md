@@ -1,7 +1,7 @@
 # Frontend – Sistema de Gestión de Inventario (SGIG)
 
 Este documento describe la estructura, instalación y funcionamiento del **frontend** del Proyecto Final Integrador.  
-El frontend implementa la interfaz completa del sistema SGIG, incluyendo login, dashboard, productos, movimientos y módulos prototipo.
+El frontend implementa la **interfaz final del sistema SGIG**, completamente integrada con la API backend y operando sobre datos reales.
 
 ---
 
@@ -87,17 +87,17 @@ VITE_API_KEY=mi_api_key_segura
   - Proveedores  
 - Barras, estados, tarjetas dinámicas
 
-## Productos (mock)
-- Listado con filtros  
-- Vista responsiva  
+## Productos
+- CRUD completo integrado con backend  
+- Listado con filtros y búsqueda  
+- Impacto directo en stock  
 - Exportación PDF + XLS  
-- Modal de exportación  
-- CRUD visual prototipo  
+- Vista responsiva  
 
-## Categorías (WIP)
-- Página agregada en prototipo  
-- Sidebar habilitado  
-- Próxima integración con backend  
+## Categorías
+- CRUD completo  
+- Integración con backend  
+- Asociación con productos  
 
 ## Movimientos
 - **Conectado a backend real**  
@@ -106,8 +106,7 @@ VITE_API_KEY=mi_api_key_segura
   - producto  
   - fechas  
   - búsqueda  
-- Exportación CSV  
-- Rotación de productos  
+- Exportación CSV   
 - Modal crear/editar  
 - Tabla responsiva
 
@@ -143,11 +142,11 @@ Acceder en:
 
 ## PDF
 - Usa `jspdf` + `jspdf-autotable`
-- Exporta tabla completa de productos (mock)
+- Exporta tablas con datos obtenidos desde la API
 
 ## XLS
 - Usa `xlsx` (SheetJS)
-- Exporta tabla mock
+- Exporta datos del sistema
 
 ---
 

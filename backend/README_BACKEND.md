@@ -2,7 +2,9 @@
 
 Este backend forma parte del **Proyecto Final Integrador**, desarrollado con **Node.js + Express + Sequelize** y base de datos **PostgreSQL**.
 
-Incluye autenticación, middlewares de seguridad, CRUD completos, estadísticas y reportes para el sistema de inventario.
+Incluye autenticación, middlewares de seguridad, CRUD completos, estadísticas y reportes,
+y constituye el **backend productivo del sistema**, operando sobre una base de datos PostgreSQL
+con persistencia real de datos.
 
 ---
 
@@ -13,7 +15,6 @@ Incluye autenticación, middlewares de seguridad, CRUD completos, estadísticas 
 - **PostgreSQL**
 - **JWT Authentication**
 - **API Key Middleware**
-- **bcrypt (a implementar en versión final)**
 - **Nodemon** para desarrollo
 - **CORS, dotenv**
 
@@ -37,11 +38,11 @@ backend/
 │   │   └── apikey.js
 │   │
 │   ├── models/
-│   │   ├── Producto.js
-│   │   ├── Proveedor.js
-│   │   ├── Categoria.js
-│   │   └── index.js
-│   │
+│   ├── Producto.js
+│   ├── Proveedor.js
+│   ├── Categoria.js
+│   ├── MovimientoStock.js
+│   └── index.js
 │   ├── routes/
 │   │   ├── auth.js
 │   │   ├── productos.js
@@ -60,6 +61,9 @@ backend/
 ---
 
 ## 🔐 Autenticación y seguridad
+
+> El sistema implementa un esquema de autenticación académico con usuario administrador único,
+suficiente para demostrar control de acceso, JWT y protección de rutas según la consigna.
 
 ### 1) API Key  
 Cada request debe incluir:
@@ -167,6 +171,8 @@ GET    /api/movimientos
 POST   /api/movimientos
 PUT    /api/movimientos/:id
 DELETE /api/movimientos/:id
+GET    /api/movimientos/reportes/periodo
+GET    /api/movimientos/reportes/rotacion
 ```
 
 ### 🔹 **Dashboard**
@@ -217,5 +223,5 @@ Este módulo fue desarrollado por:
 
 ---
 
-Proyecto académico — Universidad / Proyecto Final Integrador.
+Proyecto académico — Entrega final del Proyecto Final Integrador.
 

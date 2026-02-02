@@ -1,16 +1,28 @@
-const MovimientoStock = require("../models/MovimientoStock");
-const Producto = require("../models/Producto");
+// backend/src/controllers/movimientos.controller.js
+const { MovimientoStock, Producto } = require("../models");
 const { Op } = require("sequelize");
 
 // Obtener todos los movimientos
 const obtenerMovimientos = async (req, res) => {
   try {
-    const { tipo, productoId, fechaInicio, fechaFin, page = 1, limit = 10 } = req.query;
-    const offset = (page - 1) * limit;
+    const {
+      tipo,
+      productoId,
+      fechaInicio,
+      fechaFin,
+      page = 1,
+      limit = 10,
+    } = req.query;
+
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+    const limitNum = Math.max(1, parseInt(limit, 10) || 10);
+    const offset = (pageNum - 1) * limitNum;
 
     const where = {};
+
     if (tipo) where.tipo = tipo;
     if (productoId) where.productoId = productoId;
+
     if (fechaInicio || fechaFin) {
       where.fecha = {};
       if (fechaInicio) where.fecha[Op.gte] = new Date(fechaInicio);
@@ -19,16 +31,16 @@ const obtenerMovimientos = async (req, res) => {
 
     const { count, rows } = await MovimientoStock.findAndCountAll({
       where,
-      limit: parseInt(limit),
-      offset: parseInt(offset),
+      limit: limitNum,
+      offset,
       order: [["fecha", "DESC"]],
     });
 
     res.json({
       total: count,
-      page: parseInt(page),
-      limit: parseInt(limit),
-      pages: Math.ceil(count / limit),
+      page: pageNum,
+      limit: limitNum,
+      pages: Math.ceil(count / limitNum),
       data: rows,
     });
   } catch (error) {
@@ -40,8 +52,8 @@ const obtenerMovimientos = async (req, res) => {
 const obtenerMovimientoPorId = async (req, res) => {
   try {
     const { id } = req.params;
-    const movimiento = await MovimientoStock.findByPk(id);
 
+    const movimiento = await MovimientoStock.findByPk(id);
     if (!movimiento) {
       return res.status(404).json({ error: "Movimiento no encontrado" });
     }
@@ -55,54 +67,53 @@ const obtenerMovimientoPorId = async (req, res) => {
 // Crear un nuevo movimiento
 const crearMovimiento = async (req, res) => {
   try {
-    const { productoId, tipo, cantidad, fecha, descripcion, usuario } = req.body;
+    const { productoId, tipo, cantidad, fecha, descripcion } = req.body;
 
     if (!productoId || !tipo || !cantidad) {
       return res.status(400).json({ error: "Faltan datos requeridos" });
     }
 
     if (!["ENTRADA", "SALIDA"].includes(tipo)) {
-      return res.status(400).json({ error: "Tipo debe ser ENTRADA o SALIDA" });
+      return res.status(400).json({ error: "Tipo inválido" });
     }
 
-    // Verificar que el producto existe
     const producto = await Producto.findByPk(productoId);
     if (!producto) {
       return res.status(404).json({ error: "Producto no encontrado" });
     }
 
-    // Crear el movimiento
+    // USUARIO TOMADO DEL TOKEN
+    const usuario = req.user?.username || "Sistema";
+
     const movimiento = await MovimientoStock.create({
       productoId,
       tipo,
       cantidad,
       fecha: fecha || new Date(),
       descripcion,
-      usuario: usuario || "Sistema",
+      usuario,
     });
 
-    // Actualizar stock del producto
-    const cantidadNumerica = parseFloat(cantidad);
+    const qty = parseFloat(cantidad);
+
     if (tipo === "ENTRADA") {
-      producto.stock += cantidadNumerica;
-    } else if (tipo === "SALIDA") {
-      // Validar que hay suficiente stock
-      if (producto.stock < cantidadNumerica) {
-        // Eliminar el movimiento creado
+      producto.stock += qty;
+    } else {
+      if (producto.stock < qty) {
         await movimiento.destroy();
-        return res.status(400).json({ error: "Stock insuficiente para esta salida" });
+        return res.status(400).json({ error: "Stock insuficiente" });
       }
-      producto.stock -= cantidadNumerica;
+      producto.stock -= qty;
     }
 
     await producto.save();
 
-    res.status(201).json({
+    return res.status(201).json({
       movimiento,
       stockActual: producto.stock,
     });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    return res.status(400).json({ error: error.message });
   }
 };
 
@@ -110,41 +121,33 @@ const crearMovimiento = async (req, res) => {
 const actualizarMovimiento = async (req, res) => {
   try {
     const { id } = req.params;
-    const { tipo, cantidad, fecha, descripcion, usuario } = req.body;
+    const { tipo, cantidad, fecha, descripcion } = req.body;
 
     const movimiento = await MovimientoStock.findByPk(id);
-
     if (!movimiento) {
       return res.status(404).json({ error: "Movimiento no encontrado" });
     }
 
-    // Obtener el producto
     const producto = await Producto.findByPk(movimiento.productoId);
     if (!producto) {
       return res.status(404).json({ error: "Producto no encontrado" });
     }
 
-    // Si cambia tipo o cantidad, necesitamos recalcular stock
     const tipoAnterior = movimiento.tipo;
     const cantidadAnterior = parseFloat(movimiento.cantidad);
     const cantidadNueva = cantidad ? parseFloat(cantidad) : cantidadAnterior;
     const tipoNuevo = tipo || tipoAnterior;
 
     if (tipoNuevo !== tipoAnterior || cantidadNueva !== cantidadAnterior) {
-      // Revertir el impacto anterior
-      if (tipoAnterior === "ENTRADA") {
-        producto.stock -= cantidadAnterior;
-      } else {
-        producto.stock += cantidadAnterior;
-      }
+      // revertir impacto anterior
+      if (tipoAnterior === "ENTRADA") producto.stock -= cantidadAnterior;
+      else producto.stock += cantidadAnterior;
 
-      // Aplicar nuevo impacto
-      if (tipoNuevo === "ENTRADA") {
-        producto.stock += cantidadNueva;
-      } else {
-        // Validar stock suficiente para salida
+      // aplicar nuevo impacto
+      if (tipoNuevo === "ENTRADA") producto.stock += cantidadNueva;
+      else {
         if (producto.stock < cantidadNueva) {
-          return res.status(400).json({ error: "Stock insuficiente para esta operación" });
+          return res.status(400).json({ error: "Stock insuficiente" });
         }
         producto.stock -= cantidadNueva;
       }
@@ -152,21 +155,21 @@ const actualizarMovimiento = async (req, res) => {
       await producto.save();
     }
 
-    // Actualizar movimiento
+    // actualizar solo campos permitidos
     if (tipo) movimiento.tipo = tipo;
     if (cantidad) movimiento.cantidad = cantidad;
     if (fecha) movimiento.fecha = fecha;
-    if (descripcion) movimiento.descripcion = descripcion;
-    if (usuario) movimiento.usuario = usuario;
+    if (descripcion !== undefined) movimiento.descripcion = descripcion;
 
+    // NO se toca movimiento.usuario
     await movimiento.save();
 
-    res.json({
+    return res.json({
       movimiento,
       stockActual: producto.stock,
     });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    return res.status(400).json({ error: error.message });
   }
 };
 
@@ -176,29 +179,25 @@ const eliminarMovimiento = async (req, res) => {
     const { id } = req.params;
 
     const movimiento = await MovimientoStock.findByPk(id);
-
     if (!movimiento) {
       return res.status(404).json({ error: "Movimiento no encontrado" });
     }
 
-    // Obtener el producto para revertir el cambio de stock
     const producto = await Producto.findByPk(movimiento.productoId);
     if (!producto) {
       return res.status(404).json({ error: "Producto no encontrado" });
     }
 
-    // Revertir el impacto en stock
     const cantidadNumerica = parseFloat(movimiento.cantidad);
+
+    // Revertir impacto
     if (movimiento.tipo === "ENTRADA") {
       producto.stock -= cantidadNumerica;
-    } else if (movimiento.tipo === "SALIDA") {
+    } else {
       producto.stock += cantidadNumerica;
     }
 
-    // Asegurar que el stock no sea negativo
-    if (producto.stock < 0) {
-      producto.stock = 0;
-    }
+    if (producto.stock < 0) producto.stock = 0;
 
     await producto.save();
     await movimiento.destroy();
@@ -212,7 +211,7 @@ const eliminarMovimiento = async (req, res) => {
   }
 };
 
-// Obtener movimientos por período (para reportes)
+// Reporte por periodo
 const movimientosPorPeriodo = async (req, res) => {
   try {
     const { fechaInicio, fechaFin } = req.query;
@@ -237,14 +236,14 @@ const movimientosPorPeriodo = async (req, res) => {
   }
 };
 
-// Obtener rotación por producto
+// Reporte rotación por producto
 const rotacionPorProducto = async (req, res) => {
   try {
     const { productoId, fechaInicio, fechaFin } = req.query;
 
     const where = {};
     if (productoId) where.productoId = productoId;
-    
+
     if (fechaInicio || fechaFin) {
       where.fecha = {};
       if (fechaInicio) where.fecha[Op.gte] = new Date(fechaInicio);
@@ -256,38 +255,29 @@ const rotacionPorProducto = async (req, res) => {
       order: [["fecha", "DESC"]],
     });
 
-    // Agrupar por producto
     const rotacionMap = new Map();
 
     movimientos.forEach((mov) => {
       const pId = mov.productoId;
       if (!rotacionMap.has(pId)) {
-        rotacionMap.set(pId, {
-          productoId: pId,
-          totalEntradas: 0,
-          totalSalidas: 0,
-          movimientos: [],
-        });
+        rotacionMap.set(pId, { productoId: pId, totalEntradas: 0, totalSalidas: 0 });
       }
 
       const data = rotacionMap.get(pId);
-      if (mov.tipo === "ENTRADA") {
-        data.totalEntradas += parseFloat(mov.cantidad);
-      } else {
-        data.totalSalidas += parseFloat(mov.cantidad);
-      }
-      data.movimientos.push(mov);
+      const cant = parseFloat(mov.cantidad);
+
+      if (mov.tipo === "ENTRADA") data.totalEntradas += cant;
+      else data.totalSalidas += cant;
     });
 
-    // Calcular rotación para cada producto
     const resultado = Array.from(rotacionMap.values()).map((item) => ({
       productoId: item.productoId,
       totalEntradas: parseFloat(item.totalEntradas.toFixed(2)),
       totalSalidas: parseFloat(item.totalSalidas.toFixed(2)),
-      rotacion: item.totalEntradas > 0 
-        ? parseFloat((item.totalSalidas / item.totalEntradas).toFixed(2))
-        : 0,
-      movimientos: item.movimientos,
+      rotacion:
+        item.totalEntradas > 0
+          ? parseFloat((item.totalSalidas / item.totalEntradas).toFixed(2))
+          : 0,
     }));
 
     res.json(resultado);

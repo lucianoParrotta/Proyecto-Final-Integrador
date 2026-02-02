@@ -1,3 +1,4 @@
+// backend/src/app.js
 // CJS (sin "type": "module")
 const express = require("express");
 const cors = require("cors");
@@ -50,6 +51,14 @@ const corsOptions = {
 
 // IMPORTANTE: CORS primero
 app.use(cors(corsOptions));
+
+// Preflight OPTIONS (sin wildcard route: evita crash de Express 5 / path-to-regexp)
+app.use((req, res, next) => {
+  if (req.method === "OPTIONS") {
+    return cors(corsOptions)(req, res, next);
+  }
+  next();
+});
 
 /* =========================
    MIDDLEWARES GENERALES

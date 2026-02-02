@@ -1,166 +1,204 @@
-import { useState, useEffect } from "react";
-import React from "react";
-import { getMovimientosMock, updateMovimientoMock, deleteMovimientoMock, addMovimientoMock } from "../mocks/movimientosMock";
+// frontend/src/pages/MovimientosListPage.tsx
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  getMovimientos,
+  createMovimiento,
+  updateMovimiento,
+  deleteMovimiento,
+  type MovimientoDTO,
+} from "../api/movimientosApi";
+import { getProductos, type ProductoDTO } from "../api/productosApi";
 
-interface Movimiento {
-  id: number;
-  productoId: number;
+type MovimientoFormState = {
+  productoId: string; // string para select/input
   tipo: "ENTRADA" | "SALIDA";
-  cantidad: number;
-  fecha: string;
+  cantidad: string;
   descripcion: string;
-  usuario: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface ApiResponse {
-  total: number;
-  page: number;
-  limit: number;
-  pages: number;
-  data: Movimiento[];
-}
+};
 
 const MovimientosListPage: React.FC = () => {
-  const [movimientos, setMovimientos] = useState<Movimiento[]>([]);
+  const [movimientos, setMovimientos] = useState<MovimientoDTO[]>([]);
+  const [productos, setProductos] = useState<ProductoDTO[]>([]);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalMovimientos, setTotalMovimientos] = useState(0);
   const [limit] = useState(10);
 
-  // Filtros
+  // Filtros (backend)
   const [filtroTipo, setFiltroTipo] = useState("");
-  const [filtroProducto, setFiltroProducto] = useState("");
+  const [filtroProducto, setFiltroProducto] = useState(""); // productoId
   const [filtroFechaInicio, setFiltroFechaInicio] = useState("");
   const [filtroFechaFin, setFiltroFechaFin] = useState("");
+
+  // Búsqueda (cliente, sobre página actual)
   const [busqueda, setBusqueda] = useState("");
 
   // Modal
   const [mostrarModal, setMostrarModal] = useState(false);
   const [editando, setEditando] = useState(false);
   const [movimientoSeleccionado, setMovimientoSeleccionado] =
-    useState<Movimiento | null>(null);
+    useState<MovimientoDTO | null>(null);
 
-  // Formulario
-  const [formulario, setFormulario] = useState({
+  // Formulario (✅ sin usuario)
+  const [formulario, setFormulario] = useState<MovimientoFormState>({
     productoId: "",
     tipo: "ENTRADA",
     cantidad: "",
     descripcion: "",
-    usuario: "",
   });
 
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+  // Map productoId => "CODIGO - Nombre"
+  const productoLabelById = useMemo(() => {
+    const map = new Map<number, string>();
+    productos.forEach((p) => {
+      const codigo = String(p.codigo ?? "").trim();
+      const nombre = String(p.nombre ?? "").trim();
+      const label =
+        [codigo, nombre].filter(Boolean).join(" - ") || `Producto #${p.id}`;
+      map.set(Number(p.id), label);
+    });
+    return map;
+  }, [productos]);
 
-  useEffect(() => {
-    cargarMovimientos();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, filtroTipo, filtroProducto, filtroFechaInicio, filtroFechaFin]);
+  const cargarProductos = async () => {
+    try {
+      const prods = await getProductos();
+      setProductos(prods);
+    } catch (e: any) {
+      console.error(e);
+      setError(
+        (prev) => prev ?? "No se pudieron cargar los productos para el selector."
+      );
+    }
+  };
 
   const cargarMovimientos = async () => {
     setLoading(true);
     setError(null);
 
     try {
-      // Usar mocks en lugar de API
-      let datos = getMovimientosMock();
+      const resp = await getMovimientos({
+        page,
+        limit,
+        tipo: filtroTipo || undefined,
+        productoId: filtroProducto || undefined,
+        fechaInicio: filtroFechaInicio || undefined,
+        fechaFin: filtroFechaFin || undefined,
+      });
 
-      // Aplicar filtros
-      if (filtroTipo) {
-        datos = datos.filter((m) => m.tipo === filtroTipo);
-      }
-      if (filtroProducto) {
-        datos = datos.filter((m) => m.productoId === parseInt(filtroProducto));
-      }
-      if (filtroFechaInicio || filtroFechaFin) {
-        datos = datos.filter((m) => {
-          const fecha = new Date(m.fecha);
-          if (filtroFechaInicio && fecha < new Date(filtroFechaInicio))
-            return false;
-          if (filtroFechaFin && fecha > new Date(filtroFechaFin)) return false;
-          return true;
-        });
-      }
-
-      // Simular paginación
-      const total = datos.length;
-      const pages = Math.ceil(total / limit);
-      const offset = (page - 1) * limit;
-      const paginados = datos.slice(offset, offset + limit);
-
-      setMovimientos(paginados);
-      setTotalPages(pages);
-      setTotalMovimientos(total);
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Error desconocido";
-      setError(errorMessage);
-      console.error("Error cargando movimientos:", err);
+      setMovimientos(resp.data);
+      setTotalPages(resp.pages);
+      setTotalMovimientos(resp.total);
+    } catch (err: any) {
+      console.error(err);
+      const msg =
+        err?.response?.data?.error ||
+        err?.response?.data?.message ||
+        err?.message ||
+        "Error cargando movimientos.";
+      setError(msg);
     } finally {
       setLoading(false);
     }
   };
 
+  useEffect(() => {
+    cargarProductos();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    cargarMovimientos();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, filtroTipo, filtroProducto, filtroFechaInicio, filtroFechaFin]);
+
+  const resetFormulario = () => {
+    setFormulario({
+      productoId: "",
+      tipo: "ENTRADA",
+      cantidad: "",
+      descripcion: "",
+    });
+  };
+
+  const handleNuevoMovimiento = () => {
+    resetFormulario();
+    setEditando(false);
+    setMovimientoSeleccionado(null);
+    setMostrarModal(true);
+  };
+
+  const handleEditar = (mov: MovimientoDTO) => {
+    setMovimientoSeleccionado(mov);
+    setFormulario({
+      productoId: String(mov.productoId),
+      tipo: mov.tipo,
+      cantidad: String(mov.cantidad ?? ""),
+      descripcion: String(mov.descripcion ?? ""),
+    });
+    setEditando(true);
+    setMostrarModal(true);
+  };
+
+  const handleCancelar = () => {
+    setMostrarModal(false);
+    resetFormulario();
+    setEditando(false);
+    setMovimientoSeleccionado(null);
+  };
+
   const handleGuardar = async () => {
+    setError(null);
+
+    const productoIdNum = Number(formulario.productoId);
+    const cantidadNum = Number(formulario.cantidad);
+
+    if (!Number.isFinite(productoIdNum) || productoIdNum <= 0) {
+      setError("Seleccioná un producto.");
+      return;
+    }
+    if (!Number.isFinite(cantidadNum) || cantidadNum <= 0) {
+      setError("La cantidad debe ser un número mayor a 0.");
+      return;
+    }
+
     try {
-      if (!formulario.productoId || !formulario.cantidad) {
-        setError("Por favor completa los campos requeridos");
-        return;
-      }
+      const payload = {
+        tipo: formulario.tipo,
+        cantidad: cantidadNum,
+        descripcion: formulario.descripcion?.trim() || "",
+      };
 
       if (editando && movimientoSeleccionado) {
-        // Actualizar movimiento
-        updateMovimientoMock(movimientoSeleccionado.id, {
-          productoId: parseInt(formulario.productoId),
-          tipo: formulario.tipo as "ENTRADA" | "SALIDA",
-          cantidad: parseFloat(formulario.cantidad),
-          descripcion: formulario.descripcion,
-          usuario: formulario.usuario,
-        });
+        // ✅ no mandamos usuario
+        await updateMovimiento(movimientoSeleccionado.id, payload);
       } else {
-        // Crear nuevo movimiento
-        addMovimientoMock({
-          productoId: parseInt(formulario.productoId, 10),
-          tipo: formulario.tipo as "ENTRADA" | "SALIDA",
-          cantidad: parseFloat(formulario.cantidad),
-          fecha: new Date().toISOString(),          // 👈 ESTA ES LA CLAVE
-          descripcion: formulario.descripcion,
-          usuario: formulario.usuario,
+        // ✅ no mandamos usuario (backend lo obtiene del JWT)
+        await createMovimiento({
+          productoId: productoIdNum,
+          ...payload,
         });
       }
 
       setMostrarModal(false);
-      setFormulario({
-        productoId: "",
-        tipo: "ENTRADA",
-        cantidad: "",
-        descripcion: "",
-        usuario: "",
-      });
       setEditando(false);
       setMovimientoSeleccionado(null);
-      cargarMovimientos();
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Error desconocido";
-      setError(errorMessage);
-    }
-  };
+      resetFormulario();
 
-  const handleEditar = (movimiento: Movimiento) => {
-    setMovimientoSeleccionado(movimiento);
-    setFormulario({
-      productoId: movimiento.productoId.toString(),
-      tipo: movimiento.tipo,
-      cantidad: movimiento.cantidad.toString(),
-      descripcion: movimiento.descripcion || "",
-      usuario: movimiento.usuario || "",
-    });
-    setEditando(true);
-    setMostrarModal(true);
+      await cargarMovimientos();
+    } catch (err: any) {
+      console.error(err);
+      const msg =
+        err?.response?.data?.error ||
+        err?.response?.data?.message ||
+        err?.message ||
+        "Error guardando movimiento";
+      setError(msg);
+    }
   };
 
   const handleEliminar = async (id: number) => {
@@ -168,157 +206,92 @@ const MovimientosListPage: React.FC = () => {
       return;
 
     try {
-      // Eliminar del mock
-      deleteMovimientoMock(id);
-      cargarMovimientos();
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Error desconocido";
-      setError(errorMessage);
+      await deleteMovimiento(id);
+      await cargarMovimientos();
+    } catch (err: any) {
+      console.error(err);
+      const msg =
+        err?.response?.data?.error ||
+        err?.response?.data?.message ||
+        err?.message ||
+        "Error eliminando movimiento";
+      setError(msg);
     }
   };
 
-  const handleNuevoMovimiento = () => {
-    setFormulario({
-      productoId: "",
-      tipo: "ENTRADA",
-      cantidad: "",
-      descripcion: "",
-      usuario: "",
+  // búsqueda cliente sobre página actual + soporte por producto label
+  const movimientosMostrados = useMemo(() => {
+    const q = busqueda.trim().toLowerCase();
+    if (!q) return movimientos;
+
+    return movimientos.filter((m) => {
+      const productoTxt = (
+        productoLabelById.get(Number(m.productoId)) ?? ""
+      ).toLowerCase();
+      const text = `${m.descripcion ?? ""} ${m.usuario ?? ""} ${productoTxt}`.toLowerCase();
+      return text.includes(q);
     });
-    setEditando(false);
-    setMovimientoSeleccionado(null);
-    setMostrarModal(true);
-  };
+  }, [movimientos, busqueda, productoLabelById]);
 
-  const handleCancelar = () => {
-    setMostrarModal(false);
-    setFormulario({
-      productoId: "",
-      tipo: "ENTRADA",
-      cantidad: "",
-      descripcion: "",
-      usuario: "",
-    });
-    setEditando(false);
-    setMovimientoSeleccionado(null);
-  };
-
-  const exportarPDF = async () => {
+  // EXPORT CSV
+  const exportarMovimientosCSV = async () => {
     try {
-      // Usar mocks para exportar
-      let datos = getMovimientosMock();
-      
-      if (filtroFechaInicio || filtroFechaFin) {
-        datos = datos.filter((m) => {
-          const fecha = new Date(m.fecha);
-          if (filtroFechaInicio && fecha < new Date(filtroFechaInicio))
-            return false;
-          if (filtroFechaFin && fecha > new Date(filtroFechaFin)) return false;
-          return true;
-        });
-      }
-
-      const csvContent = [
-        [
-          "ID",
-          "Producto ID",
-          "Tipo",
-          "Cantidad",
-          "Fecha",
-          "Descripción",
-          "Usuario",
-        ],
-        ...datos.map((mov: Movimiento) => [
-          mov.id,
-          mov.productoId,
-          mov.tipo,
-          mov.cantidad,
-          new Date(mov.fecha).toLocaleDateString(),
-          mov.descripcion || "",
-          mov.usuario || "",
-        ]),
-      ];
-
-      const csv = csvContent.map((row) => row.join(",")).join("\n");
-      const blob = new Blob([csv], { type: "text/csv" });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `movimientos-${
-        new Date().toISOString().split("T")[0]
-      }.csv`;
-      link.click();
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Error desconocido";
-      setError(errorMessage);
-    }
-  };
-
-  const exportarRotacion = async () => {
-    try {
-      // Calcular rotación desde mocks
-      const datos = getMovimientosMock();
-      
-      const rotacionMap = new Map();
-      datos.forEach((mov) => {
-        const pId = mov.productoId;
-        if (!rotacionMap.has(pId)) {
-          rotacionMap.set(pId, {
-            productoId: pId,
-            totalEntradas: 0,
-            totalSalidas: 0,
-          });
-        }
-
-        const data = rotacionMap.get(pId);
-        if (mov.tipo === "ENTRADA") {
-          data.totalEntradas += mov.cantidad;
-        } else {
-          data.totalSalidas += mov.cantidad;
-        }
+      const resp = await getMovimientos({
+        page: 1,
+        limit: 10000,
+        tipo: filtroTipo || undefined,
+        productoId: filtroProducto || undefined,
+        fechaInicio: filtroFechaInicio || undefined,
+        fechaFin: filtroFechaFin || undefined,
       });
 
-      const resultado = Array.from(rotacionMap.values()).map((item) => ({
-        productoId: item.productoId,
-        totalEntradas: item.totalEntradas,
-        totalSalidas: item.totalSalidas,
-        rotacion: item.totalEntradas > 0 
-          ? (item.totalSalidas / item.totalEntradas).toFixed(2)
-          : "0.00",
+      const rows = resp.data.map((mov) => ({
+        id: mov.id,
+        producto: productoLabelById.get(Number(mov.productoId)) ?? mov.productoId,
+        tipo: mov.tipo,
+        cantidad: mov.cantidad,
+        fecha: mov.fecha,
+        descripcion: mov.descripcion ?? "",
+        usuario: mov.usuario ?? "",
       }));
 
-      const csvContent = [
-        [
-          "Producto ID",
-          "Total Entradas",
-          "Total Salidas",
-          "Rotación (Salidas/Entradas)",
-        ],
-        ...resultado.map((rot: any) => [
-          rot.productoId,
-          rot.totalEntradas,
-          rot.totalSalidas,
-          rot.rotacion,
-        ]),
+      const encabezados = [
+        "ID",
+        "Producto",
+        "Tipo",
+        "Cantidad",
+        "Fecha",
+        "Descripción",
+        "Usuario",
       ];
 
-      const csv = csvContent.map((row) => row.join(",")).join("\n");
-      const blob = new Blob([csv], {
+      const escapeCSV = (value: unknown) => {
+        const str = String(value ?? "");
+        if (/[",\n;]/.test(str)) return `"${str.replace(/"/g, '""')}"`;
+        return str;
+      };
+
+      const csvLines = [
+        encabezados.map(escapeCSV).join(";"),
+        ...rows.map((r) =>
+          [r.id, r.producto, r.tipo, r.cantidad, r.fecha, r.descripcion, r.usuario]
+            .map(escapeCSV)
+            .join(";")
+        ),
+      ];
+
+      const blob = new Blob([csvLines.join("\n")], {
         type: "text/csv;charset=utf-8;",
       });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `rotacion-productos-${
-        new Date().toISOString().split("T")[0]
-      }.csv`;
+      link.download = `movimientos-${new Date().toISOString().slice(0, 10)}.csv`;
       link.click();
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Error desconocido";
-      setError(errorMessage);
+      window.URL.revokeObjectURL(url);
+    } catch (err: any) {
+      console.error(err);
+      setError("No se pudo exportar movimientos.");
     }
   };
 
@@ -331,24 +304,18 @@ const MovimientosListPage: React.FC = () => {
             Movimientos de Stock
           </h1>
           <p className="text-slate-500 text-sm">
-            Gestiona las entradas y salidas de stock. Esta vista se conecta al
-            backend real para registrar los movimientos.
+            Gestiona las entradas y salidas de stock (datos reales desde la API).
           </p>
         </div>
 
         <div className="flex gap-2">
           <button
-            onClick={exportarPDF}
+            onClick={exportarMovimientosCSV}
             className="px-3 py-2 rounded-md border border-slate-300 text-sm text-slate-700 hover:bg-slate-50 inline-flex items-center gap-1"
           >
             Exportar movimientos
           </button>
-          <button
-            onClick={exportarRotacion}
-            className="px-3 py-2 rounded-md border border-slate-300 text-sm text-slate-700 hover:bg-slate-50 inline-flex items-center gap-1"
-          >
-            Reporte rotación
-          </button>
+
           <button
             onClick={handleNuevoMovimiento}
             className="px-3 py-2 rounded-md bg-slate-900 text-sm text-white hover:bg-slate-800 inline-flex items-center justify-center"
@@ -368,21 +335,21 @@ const MovimientosListPage: React.FC = () => {
       {/* Filtros */}
       <section className="bg-white border border-slate-200 rounded-lg shadow-sm p-4 space-y-3">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4">
-          {/* Búsqueda */}
+          {/* Búsqueda cliente */}
           <div className="col-span-1">
             <label className="block text-xs font-medium text-slate-500 mb-1">
               Buscar
             </label>
             <input
               type="text"
-              placeholder="Buscar por descripción, usuario..."
+              placeholder="Buscar por producto, descripción, usuario..."
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
               className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400"
             />
           </div>
 
-          {/* Tipo */}
+          {/* Tipo (backend) */}
           <div>
             <label className="block text-xs font-medium text-slate-500 mb-1">
               Tipo
@@ -401,21 +368,38 @@ const MovimientosListPage: React.FC = () => {
             </select>
           </div>
 
-          {/* Producto ID */}
+          {/* Producto (backend) */}
           <div>
             <label className="block text-xs font-medium text-slate-500 mb-1">
-              Producto ID
+              Producto
             </label>
-            <input
-              type="number"
-              placeholder="Producto ID"
+
+            <select
               value={filtroProducto}
               onChange={(e) => {
                 setFiltroProducto(e.target.value);
                 setPage(1);
               }}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400"
-            />
+              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400"
+            >
+              <option value="">Todos los productos</option>
+              {productos
+                .slice()
+                .sort((a, b) =>
+                  String(a.codigo ?? "").localeCompare(String(b.codigo ?? ""))
+                )
+                .map((p) => (
+                  <option key={p.id} value={String(p.id)}>
+                    {(String(p.codigo ?? "").trim() ? `${p.codigo} - ` : "") +
+                      (p.nombre ?? "")}{" "}
+                    (#{p.id})
+                  </option>
+                ))}
+            </select>
+
+            <p className="text-[11px] text-slate-400 mt-1">
+              El filtro se aplica en backend por <code>productoId</code>.
+            </p>
           </div>
 
           {/* Fecha desde */}
@@ -452,27 +436,26 @@ const MovimientosListPage: React.FC = () => {
         </div>
 
         <p className="text-xs text-slate-400">
-          Los filtros se aplican sobre los datos reales devueltos por la API de
-          movimientos.
+          Los filtros Tipo / Producto / Fecha se aplican en backend (API). La
+          búsqueda textual se aplica en el cliente sobre la página actual.
         </p>
       </section>
 
-      {/* Tabla de movimientos */}
+      {/* Tabla */}
       <section className="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden">
-        {/* Header tabla */}
         <div className="border-b border-slate-200 px-4 py-2 flex items-center justify-between text-xs text-slate-500">
           <span>
-            Mostrando <strong>{movimientos.length}</strong> de{" "}
+            Mostrando <strong>{movimientosMostrados.length}</strong> de{" "}
             <strong>{totalMovimientos}</strong> movimientos
           </span>
-          <span>Datos en tiempo real desde la API</span>
+          <span>Datos reales desde la API</span>
         </div>
 
         {loading ? (
           <div className="p-8 text-center text-sm text-slate-500">
             Cargando movimientos...
           </div>
-        ) : movimientos.length === 0 ? (
+        ) : movimientosMostrados.length === 0 ? (
           <div className="p-8 text-center text-sm text-slate-500">
             No hay movimientos registrados con los filtros actuales.
           </div>
@@ -504,69 +487,73 @@ const MovimientosListPage: React.FC = () => {
                   </th>
                 </tr>
               </thead>
+
               <tbody>
-                {movimientos
-                  .filter((m) => {
-                    if (!busqueda.trim()) return true;
-                    const text = `${m.descripcion ?? ""} ${
-                      m.usuario ?? ""
-                    }`.toLowerCase();
-                    return text.includes(busqueda.toLowerCase());
-                  })
-                  .map((movimiento) => (
+                {movimientosMostrados.map((mov) => {
+                  const productoLabel =
+                    productoLabelById.get(Number(mov.productoId)) ??
+                    `Producto #${mov.productoId}`;
+
+                  return (
                     <tr
-                      key={movimiento.id}
+                      key={mov.id}
                       className="border-b border-slate-100 hover:bg-slate-50"
                     >
                       <td className="px-3 py-2 text-xs text-slate-700">
-                        {movimiento.id}
+                        {mov.id}
                       </td>
+
                       <td className="px-3 py-2 text-xs text-slate-700">
-                        {movimiento.productoId}
+                        {productoLabel}
                       </td>
+
                       <td className="px-3 py-2 text-xs">
                         <span
                           className={
                             "inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium " +
-                            (movimiento.tipo === "ENTRADA"
+                            (mov.tipo === "ENTRADA"
                               ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                               : "bg-rose-50 text-rose-700 border border-rose-200")
                           }
                         >
-                          {movimiento.tipo}
+                          {mov.tipo}
                         </span>
                       </td>
+
                       <td className="px-3 py-2 text-xs text-right text-slate-700">
-                        {movimiento.cantidad}
+                        {String(mov.cantidad)}
                       </td>
+
                       <td className="px-3 py-2 text-xs text-slate-600">
-                        {new Date(movimiento.fecha).toLocaleDateString()}
+                        {new Date(mov.fecha).toLocaleDateString("es-AR")}
                       </td>
+
                       <td className="px-3 py-2 text-xs text-slate-600">
-                        {movimiento.usuario || "-"}
+                        {mov.usuario || "-"}
                       </td>
+
                       <td className="px-3 py-2 text-xs text-right">
                         <button
-                          onClick={() => handleEditar(movimiento)}
+                          onClick={() => handleEditar(mov)}
                           className="px-2 py-1 rounded-md border border-slate-300 text-slate-700 hover:bg-slate-50 mr-1"
                         >
                           Editar
                         </button>
                         <button
-                          onClick={() => handleEliminar(movimiento.id)}
+                          onClick={() => handleEliminar(mov.id)}
                           className="px-2 py-1 rounded-md border border-slate-200 text-slate-400 hover:bg-rose-50 hover:text-rose-700"
                         >
                           Eliminar
                         </button>
                       </td>
                     </tr>
-                  ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>
         )}
 
-        {/* Paginación */}
         {totalPages > 1 && (
           <div className="border-t border-slate-200 px-4 py-2 flex items-center justify-between text-xs text-slate-500">
             <span>
@@ -595,7 +582,7 @@ const MovimientosListPage: React.FC = () => {
         )}
       </section>
 
-      {/* Modal */}
+      {/* Modal (✅ sin input Usuario) */}
       {mostrarModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-lg max-w-md w-full overflow-hidden">
@@ -609,24 +596,37 @@ const MovimientosListPage: React.FC = () => {
             </div>
 
             <div className="p-6 space-y-4">
+              {/* Producto */}
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-2">
-                  Producto ID *
+                  Producto *
                 </label>
-                <input
-                  type="number"
+                <select
                   value={formulario.productoId}
                   onChange={(e) =>
-                    setFormulario({
-                      ...formulario,
-                      productoId: e.target.value,
-                    })
+                    setFormulario({ ...formulario, productoId: e.target.value })
                   }
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900/10"
-                  required
-                />
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10"
+                >
+                  <option value="">Seleccionar...</option>
+                  {productos
+                    .slice()
+                    .sort((a, b) =>
+                      String(a.codigo ?? "").localeCompare(String(b.codigo ?? ""))
+                    )
+                    .map((p) => (
+                      <option key={p.id} value={String(p.id)}>
+                        {(String(p.codigo ?? "").trim() ? `${p.codigo} - ` : "") +
+                          (p.nombre ?? "")}
+                      </option>
+                    ))}
+                </select>
+                <p className="text-[11px] text-slate-400 mt-1">
+                  Se muestran productos reales (código + nombre).
+                </p>
               </div>
 
+              {/* Tipo */}
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-2">
                   Tipo *
@@ -646,6 +646,7 @@ const MovimientosListPage: React.FC = () => {
                 </select>
               </div>
 
+              {/* Cantidad */}
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-2">
                   Cantidad *
@@ -655,16 +656,14 @@ const MovimientosListPage: React.FC = () => {
                   step="1"
                   value={formulario.cantidad}
                   onChange={(e) =>
-                    setFormulario({
-                      ...formulario,
-                      cantidad: e.target.value,
-                    })
+                    setFormulario({ ...formulario, cantidad: e.target.value })
                   }
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900/10"
                   required
                 />
               </div>
 
+              {/* Descripción */}
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-2">
                   Descripción
@@ -682,23 +681,7 @@ const MovimientosListPage: React.FC = () => {
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
-                  Usuario
-                </label>
-                <input
-                  type="text"
-                  value={formulario.usuario}
-                  onChange={(e) =>
-                    setFormulario({
-                      ...formulario,
-                      usuario: e.target.value,
-                    })
-                  }
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900/10"
-                />
-              </div>
-
+              {/* Botones */}
               <div className="flex gap-3 pt-2">
                 <button
                   onClick={handleGuardar}

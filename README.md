@@ -1,21 +1,79 @@
 # 🗂️ Sistema de Gestión de Inventario (SGIG)
-### Proyecto Final Integrador – Prototipo Funcional Completo
+### Proyecto Final Integrador – Sistema Funcional Desplegado
 
-Este repositorio contiene el desarrollo full-stack del **Sistema de Gestión Integral de Inventario (SGIG)**, cumpliendo con **todos los requisitos funcionales establecidos en la consigna del Proyecto Final Integrador**.
+Este repositorio contiene el desarrollo **full-stack completo y funcional** del **Sistema de Gestión Integral de Inventario (SGIG)**, realizado en el marco del **Proyecto Final Integrador**, cumpliendo **todos los requisitos funcionales y técnicos establecidos en la consigna oficial**.
 
 ---
 
 ## 👥 Integrantes del Equipo
 
-- **Luciano Parrotta** — Módulo Productos · Dashboard · UI/UX general  
+- **Luciano Parrotta** — Módulo Productos · Dashboard · UI/UX general · conexion backend con frontend · deploy
 - **Federico Ruppel** — Módulo Categorías · Seguridad global  
 - **Franco Muñoz** — Módulo Proveedores  
 - **Camilo Dietrich** — Movimientos de Stock · Autenticación · Perfil  
 
 ---
 
-## 🚀 1. Alcance de la entrega
-Este prototipo implementa **todas las funcionalidades exigidas por la consigna**, incluyendo:
+## 🚀 1. Entrega Final (estado actual)
+
+La **entrega final** corresponde a un **sistema completamente funcional**, donde **todos los módulos consumen la API real** y operan sobre una base de datos PostgreSQL.
+
+### ✔ Características principales de la entrega final
+
+- Aplicación desplegada en producción (Frontend: Vercel · Backend: Render)
+- Persistencia real de datos
+- Autenticación y autorización completas
+- Sin datos mockeados
+- Actualización automática de stock
+- Reportes y métricas reales
+- Interfaz final consistente y navegable
+
+### ✔ Funcionalidades implementadas (Entrega Final)
+### Login seguro
+-	API Key obligatoria
+-	JWT con expiración
+-	Middleware de protección de rutas
+### Dashboard
+-	Métricas en tiempo real desde backend
+-	Productos totales
+-	Stock bajo
+-	Valorización de inventario
+-	Distribuciones y rotación
+-	Reportes
+### Productos
+-	CRUD completo
+-	Filtros y búsqueda
+-	Impacto directo en stock
+-	Reportes
+### Categorías
+-	CRUD completo
+-	Filtros y búsqueda
+-	Relación con productos
+-	Reportes
+### Proveedores
+-	CRUD completo
+-	Filtros y búsqueda
+-	Asociación con productos
+-	Reportes
+### Movimientos de Stock
+-	Entradas y salidas
+-	Validación de stock
+-	Reversión al editar/eliminar
+-	Filtros por tipo, producto y fechas
+-	Reportes
+-	Exportación CSV
+### Perfil de Usuario
+-	Datos de sesión
+-	Cambio de contraseña
+### UI/UX
+-	Layout consistente
+-	Sidebar y navegación global
+-	Diseño responsivo
+
+---
+
+## 🚀 1.2. Alcance de la entrega (Entrega anterior - Prototipo)
+El **prototipo implementaba** todas las funcionalidades exigidas por la consigna, incluyendo:
 
 ### ✔ Funcionalidades completadas
 - **Login seguro** (API Key + JWT + middleware)
@@ -122,30 +180,21 @@ VITE_API_KEY=mi_api_key_segura
 
 ---
 
-## 5. Instalación y ejecución
+## 5. Ejecución en local (opcional)
+
+El sistema se encuentra desplegado en producción, pero puede ejecutarse localmente:
 
 ### Backend
 ```bash
 cd backend
 npm install
-```
-
-Crear base de datos:
-```sql
-CREATE DATABASE inventario_db;
-```
-
-Iniciar servidor:
-```bash
 npm run dev
 ```
 
 Servidor:  
 👉 http://localhost:3000/api
 
----
-
-### 🎨 Frontend
+### Frontend
 ```bash
 cd frontend
 npm install
@@ -177,33 +226,7 @@ Authorization: Bearer <token>
 
 ---
 
-## 7. Endpoints principales
-
-### Auth
-- POST /auth/login  
-- POST /auth/cambiar-password  
-- GET /auth/me  
-
-### Productos
-- CRUD completo  
-- Exportación mock PDF/XLS  
-
-### Categorías
-- CRUD completo
-- Exportación mock PDF/XLS  
-
-### Proveedores
-- CRUD completo
-
-### Movimientos
-- CRUD, filtros, reportes y exportación  
-
-### Stats
-- GET /stats/dashboard  
-
----
-
-## 8. Frontend – Funcionalidades
+## 7. Frontend – Funcionalidades
 - Autenticación mediante Context API  
 - Rutas privadas  
 - Dashboard  
@@ -213,19 +236,5 @@ Authorization: Bearer <token>
 
 ---
 
-## 9. Estado del proyecto
-Este prototipo cumple **el 100% de las funcionalidades requeridas** para esta entrega.
-
-✔ CRUD  
-✔ Reportes  
-✔ Seguridad  
-✔ Dashboard  
-✔ UI/UX  
-✔ Exportaciones  
-✔ Navegación  
-✔ Filtros  
-
----
-
 ## Notas finales
-Proyecto desarrollado **version prototipo** para el *Proyecto Final Integrador*.  
+Este proyecto representa la entrega final del Proyecto Final Integrador, mostrando la evolución desde un prototipo funcional hacia un sistema de gestión completo, desplegado y operativo, respetando buenas prácticas de desarrollo full-stack y documentación técnica. 

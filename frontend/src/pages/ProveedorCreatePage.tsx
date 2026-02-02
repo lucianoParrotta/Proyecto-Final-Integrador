@@ -1,6 +1,7 @@
-// frontend/src/pages/ProveedorCreatePage.tsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { createProveedor } from "../api/proveedoresApi";
+import type { Proveedor } from "../types/proveedor";
 
 const ProveedorCreatePage: React.FC = () => {
   const navigate = useNavigate();
@@ -11,37 +12,63 @@ const ProveedorCreatePage: React.FC = () => {
   const [telefono, setTelefono] = useState("");
   const [direccion, setDireccion] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
 
-    console.log("Proveedor creado (mock)");
+    if (!nombre.trim()) {
+      setError("El nombre es obligatorio.");
+      return;
+    }
 
-    navigate("/proveedores");
+    const payload: Partial<Proveedor> = {
+      nombre: nombre.trim(),
+      cuit: cuit.trim() || undefined,
+      email: email.trim() || undefined,
+      telefono: telefono.trim() || undefined,
+      direccion: direccion.trim() || undefined,
+    };
+
+    try {
+      setLoading(true);
+      await createProveedor(payload);
+      navigate("/proveedores");
+    } catch (err: any) {
+      console.error(err);
+      const msg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err?.message ||
+        "Error creando proveedor";
+      setError(msg);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleCancel = () => {
-    navigate("/proveedores");
-  };
+  const handleCancel = () => navigate("/proveedores");
 
   return (
     <div className="space-y-6">
-      {/* Título principal */}
       <div>
-        <h1 className="text-2xl font-semibold text-slate-800">
-          Nuevo Proveedor
-        </h1>
+        <h1 className="text-2xl font-semibold text-slate-800">Nuevo Proveedor</h1>
         <p className="text-slate-500 text-sm">
-          Registrar un proveedor en el inventario (vista prototipo).
+          Registrar un proveedor en el inventario.
         </p>
       </div>
 
-      {/* Card */}
+      {error && (
+        <div className="rounded-md border border-red-200 bg-red-50 text-red-700 text-sm px-3 py-2">
+          {error}
+        </div>
+      )}
+
       <section className="bg-white border border-slate-200 rounded-lg shadow-sm p-6 max-w-4xl">
         <form className="space-y-6" onSubmit={handleSubmit}>
-          
-          {/* Grid de inputs */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
             <div>
               <label className="block text-xs font-medium text-slate-500 mb-1">
                 Nombre *
@@ -96,7 +123,6 @@ const ProveedorCreatePage: React.FC = () => {
             </div>
           </div>
 
-          {/* Dirección */}
           <div>
             <label className="block text-xs font-medium text-slate-500 mb-1">
               Dirección
@@ -110,21 +136,22 @@ const ProveedorCreatePage: React.FC = () => {
             />
           </div>
 
-          {/* Botones */}
           <div className="flex gap-3">
             <button
               type="submit"
+              disabled={loading}
               className="px-4 py-2 rounded-md bg-slate-900 text-white text-sm 
-                         hover:bg-slate-800"
+                         hover:bg-slate-800 disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              Guardar (prototipo)
+              {loading ? "Guardando..." : "Guardar"}
             </button>
 
             <button
               type="button"
               onClick={handleCancel}
+              disabled={loading}
               className="px-4 py-2 rounded-md bg-slate-100 text-slate-700 text-sm 
-                         hover:bg-slate-200"
+                         hover:bg-slate-200 disabled:opacity-60 disabled:cursor-not-allowed"
             >
               Cancelar
             </button>
