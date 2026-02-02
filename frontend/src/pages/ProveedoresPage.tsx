@@ -74,6 +74,51 @@ const ProveedoresPage: React.FC = () => {
     return <div className="text-sm text-slate-500">Cargando proveedores...</div>;
   }
 
+  //exportar CSV
+  const exportarProveedoresCSV = () => {
+    try {
+      const rows = proveedoresFiltrados;
+
+      const encabezados = ["ID", "Nombre", "Teléfono", "Email", "CUIT", "Dirección"];
+
+      const escapeCSV = (value: unknown) => {
+        const str = String(value ?? "");
+        if (/[",\n;]/.test(str)) return `"${str.replace(/"/g, '""')}"`;
+        return str;
+      };
+
+      const csvLines = [
+        encabezados.map(escapeCSV).join(";"),
+        ...rows.map((p) =>
+          [
+            p.id,
+            p.nombre ?? "",
+            p.telefono ?? "",
+            p.email ?? "",
+            p.cuit ?? "",
+            p.direccion ?? "",
+          ]
+            .map(escapeCSV)
+            .join(";")
+        ),
+      ];
+
+      const blob = new Blob([csvLines.join("\n")], {
+        type: "text/csv;charset=utf-8;",
+      });
+
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `proveedores-${new Date().toISOString().slice(0, 10)}.csv`;
+      link.click();
+      window.URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error(e);
+      setError("No se pudo exportar el listado de proveedores.");
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Encabezado */}
@@ -86,10 +131,9 @@ const ProveedoresPage: React.FC = () => {
         </div>
 
         <div className="flex gap-2">
-          {/* (si querés después hacemos export como Productos) */}
           <button
-            className="px-3 py-2 rounded-md border border-slate-200 text-sm text-slate-400 cursor-not-allowed"
-            title="Pendiente de implementar"
+            onClick={exportarProveedoresCSV}
+            className="px-3 py-2 rounded-md border border-slate-300 text-sm text-slate-700 hover:bg-slate-50 inline-flex items-center gap-1"
           >
             Exportar listado
           </button>
