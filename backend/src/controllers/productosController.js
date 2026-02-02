@@ -1,6 +1,6 @@
 // backend/src/controllers/productosController.js
-const { Op } = require('sequelize');
-const { Producto, Categoria } = require('../models');
+const { Op, Sequelize } = require('sequelize');
+const { Producto, Categoria, Proveedor } = require('../models');
 
 // GET /productos
 const getProductos = async (req, res, next) => {
@@ -43,11 +43,16 @@ const getProductos = async (req, res, next) => {
       include: [
         {
           model: Categoria,
-          as: 'categoria',
-          attributes: ['id', 'nombre'],
+          as: "categoria",
+          attributes: ["id", "nombre"],
+        },
+        {
+          model: Proveedor,
+          as: "proveedor",
+          attributes: ["id", "nombre"],
         },
       ],
-      order: [['nombre', 'ASC']],
+      order: [["nombre", "ASC"]],
     });
 
     res.json(productos);
@@ -65,8 +70,13 @@ const getProductoById = async (req, res, next) => {
       include: [
         {
           model: Categoria,
-          as: 'categoria',
-          attributes: ['id', 'nombre'],
+          as: "categoria",
+          attributes: ["id", "nombre"],
+        },
+        {
+          model: Proveedor,
+          as: "proveedor",
+          attributes: ["id", "nombre"],
         },
       ],
     });

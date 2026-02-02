@@ -1,4 +1,9 @@
+// backend/src/routes/movimientos.js
 const express = require("express");
+const router = express.Router();
+
+const verifyToken = require("../middlewares/auth");
+
 const {
   obtenerMovimientos,
   obtenerMovimientoPorId,
@@ -9,17 +14,18 @@ const {
   rotacionPorProducto,
 } = require("../controllers/movimientosController");
 
-const router = express.Router();
+// JWT obligatorio para todo movimientos
+router.use(verifyToken);
 
-// Rutas CRUD
-router.get("/", obtenerMovimientos);
-router.get("/:id", obtenerMovimientoPorId);
-router.post("/", crearMovimiento);
-router.put("/:id", actualizarMovimiento);
-router.delete("/:id", eliminarMovimiento);
-
-// Rutas especiales
+// Rutas especiales PRIMERO (antes de "/:id")
 router.get("/reportes/periodo", movimientosPorPeriodo);
 router.get("/reportes/rotacion", rotacionPorProducto);
+
+// CRUD
+router.get("/", obtenerMovimientos);
+router.post("/", crearMovimiento);
+router.get("/:id", obtenerMovimientoPorId);
+router.put("/:id", actualizarMovimiento);
+router.delete("/:id", eliminarMovimiento);
 
 module.exports = router;

@@ -1,3 +1,4 @@
+// backend/src/app.js
 // CJS (sin "type": "module")
 const express = require("express");
 const cors = require("cors");

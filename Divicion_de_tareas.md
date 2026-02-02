@@ -103,13 +103,17 @@ Cada alumno debe entregar su módulo con:
 
 # 3. División Global del Sistema (Reparto Equilibrado)
 
-## Luciano (Frontend)
+## Luciano (Frontend + Deploy)
 - Navbar + Sidebar
 - Layout general
 - Home del sistema
 - Estadísticas principales (solo consumo, no creación de endpoints)
 - Diseño general UI
 - README técnico del FRONTEND
+- Deploy del frontend en Vercel
+- Deploy del backend en Render
+- Variables de entorno
+- Conexion del backend con el frontend
 
 ## Federico (Backend + Docs)
 - README técnico principal (global)
@@ -118,17 +122,13 @@ Cada alumno debe entregar su módulo con:
 - Middleware API_KEY global
 - **Implementación de endpoints de estadísticas**
 
-## Franco (Backend + Deploy)
-- Deploy del backend en Render
-- Variables de entorno
+## Franco (Backend)
 - Estructura y estandarización de controladores backend
 - **Soporte en endpoints de estadísticas**
 - Organización general backend
 
-## Camilo (Frontend + Deploy)
+## Camilo (Frontend)
 - Login y persistencia
 - Perfil de usuario
-- Deploy del frontend en Vercel
 - Integración de estadísticas con el home
-
 ---
