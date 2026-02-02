@@ -1,3 +1,4 @@
+// backend/src/middlewares/apiKey.js
 function apiKeyMiddleware(req, res, next) {
   //Permitir preflight CORS (no viene con x-api-key)
   if (req.method === "OPTIONS") return next();

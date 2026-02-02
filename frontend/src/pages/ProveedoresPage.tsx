@@ -1,38 +1,78 @@
-// frontend/src/pages/ProveedoresPage.tsx
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import type { Proveedor } from "../types/proveedor";
-import { getProveedoresMock } from "../api/proveedoresMock";
+import { getProveedores, deleteProveedor } from "../api/proveedoresApi";
 import ProveedorList from "../components/proveedores/ProveedorList";
 
 const ProveedoresPage: React.FC = () => {
   const [proveedores, setProveedores] = useState<Proveedor[]>([]);
   const [busqueda, setBusqueda] = useState("");
 
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchProveedores = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await getProveedores();
+      setProveedores(data);
+    } catch (e: any) {
+      console.error(e);
+      setError(
+        e?.response?.data?.message ||
+          e?.response?.data?.error ||
+          e?.message ||
+          "No se pudieron cargar los proveedores."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    setProveedores(getProveedoresMock());
+    fetchProveedores();
   }, []);
 
-  const handleDelete = (id: string) => {
-    setProveedores((prev) => prev.filter((p) => p.id !== id));
+  const handleDelete = async (id: string) => {
+    // id viene como string en tu type (mock), pero en backend es numérico.
+    const idNum = Number(id);
+    if (!Number.isFinite(idNum)) {
+      alert("ID inválido. No se pudo eliminar.");
+      return;
+    }
+
+    if (!window.confirm("¿Seguro que querés eliminar este proveedor?")) return;
+
+    try {
+      await deleteProveedor(idNum);
+      // optimista: actualizo state local
+      setProveedores((prev) => prev.filter((p) => String(p.id) !== String(id)));
+    } catch (e: any) {
+      console.error(e);
+      alert(
+        e?.response?.data?.message ||
+          e?.response?.data?.error ||
+          e?.message ||
+          "No se pudo eliminar el proveedor."
+      );
+    }
   };
 
   const proveedoresFiltrados = useMemo(() => {
     const term = busqueda.trim().toLowerCase();
     if (!term) return proveedores;
 
-    return proveedores.filter((p) =>
-      [
-        p.nombre,
-        p.email,
-        p.cuit,
-        p.telefono,
-        p.direccion,
-      ]
+    return proveedores.filter((p: any) =>
+      [p.nombre, p.email, p.cuit, p.telefono, p.direccion]
         .filter(Boolean)
-        .some((campo) => campo.toLowerCase().includes(term))
+        .some((campo: string) => campo.toLowerCase().includes(term))
     );
   }, [proveedores, busqueda]);
+
+  if (loading) {
+    return <div className="text-sm text-slate-500">Cargando proveedores...</div>;
+  }
 
   return (
     <div className="space-y-6">
@@ -41,18 +81,17 @@ const ProveedoresPage: React.FC = () => {
         <div>
           <h1 className="text-2xl font-semibold text-slate-800">Proveedores</h1>
           <p className="text-slate-500 text-sm">
-            Administración de proveedores del inventario. Esta vista es parte del
-            prototipo: los datos están mockeados en el frontend.
+            Administración de proveedores del inventario (datos reales).
           </p>
         </div>
 
         <div className="flex gap-2">
-          {/* Botón de exportar futuro (por ahora deshabilitado) */}
+          {/* (si querés después hacemos export como Productos) */}
           <button
             className="px-3 py-2 rounded-md border border-slate-200 text-sm text-slate-400 cursor-not-allowed"
-            title="Funcionalidad en prototipo"
+            title="Pendiente de implementar"
           >
-            Exportar listado (Mock)
+            Exportar listado
           </button>
 
           <Link
@@ -63,6 +102,12 @@ const ProveedoresPage: React.FC = () => {
           </Link>
         </div>
       </div>
+
+      {error && (
+        <div className="rounded-md border border-red-200 bg-red-50 text-red-700 text-sm px-3 py-2">
+          {error}
+        </div>
+      )}
 
       {/* Filtros / búsqueda */}
       <section className="bg-white border border-slate-200 rounded-lg shadow-sm p-4 space-y-3">
@@ -80,18 +125,10 @@ const ProveedoresPage: React.FC = () => {
             />
           </div>
         </div>
-
-        <p className="text-xs text-slate-400">
-          La búsqueda funciona solamente sobre el conjunto de datos mock del prototipo.
-          En la versión final se conectará al backend real y a la base de datos.
-        </p>
       </section>
 
       {/* Listado */}
-      <ProveedorList
-        proveedores={proveedoresFiltrados}
-        onDelete={handleDelete}
-      />
+      <ProveedorList proveedores={proveedoresFiltrados} onDelete={handleDelete} />
     </div>
   );
 };
